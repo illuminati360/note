@@ -2,6 +2,10 @@
   "name": "tiptap-rn-poc",
   "version": "1.0.0",
   "main": "index.ts",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -9,14 +13,23 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "expo": "~54.0.30",
+    "@prose/tiptap-extensions": "*",
+    "@tiptap/core": "^3.14.0",
+    "@tiptap/pm": "^3.14.0",
+    "@tiptap/react": "^3.14.0",
+    "@tiptap/starter-kit": "^3.14.0",
+    "expo": "~54.0.31",
     "expo-status-bar": "~3.0.9",
     "react": "19.1.0",
-    "react-native": "0.81.5"
+    "react-dom": "^19.1.0",
+    "react-native": "0.81.5",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-svg": "^15.12.1",
+    "react-native-web": "^0.21.2",
+    "react-native-webview": "13.15.0"
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
     "typescript": "~5.9.2"
-  },
-  "private": true
+  }
 }

@@ -1,0 +1,29 @@
+{
+  "name": "editor-web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@prose/tiptap-extensions": "file:../packages/tiptap-extensions",
+    "@tiptap/core": "^3.14.0",
+    "@tiptap/extension-document": "^3.14.0",
+    "@tiptap/extension-paragraph": "^3.14.0",
+    "@tiptap/extension-text": "^3.14.0",
+    "@tiptap/pm": "^3.14.0",
+    "@tiptap/starter-kit": "^3.14.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^7.3.0",
+    "vite-plugin-singlefile": "^2.3.0"
+  }
+}
