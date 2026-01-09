@@ -5,6 +5,7 @@ export { Flower, type FlowerOptions, type FlowerAttributes } from './extensions/
 
 // Margin Note Extension
 export { MarginNote, type MarginNoteOptions, type MarginNoteAttributes } from './extensions/MarginNote';
+export { NoteHighlight, type NoteHighlightOptions, type NoteHighlightAttributes } from './extensions/NoteHighlight';
 
 // SVG generation utilities (for icons, etc.)
 export * from './svg';

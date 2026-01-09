@@ -39,6 +39,8 @@ export interface TipTapEditorProps {
   onContentChange?: (content: EditorContent) => void;
   onSelectionChange?: (state: EditorState) => void;
   onReady?: () => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
   onAnchorPositions?: (positions: AnchorPosition[]) => void;
   onMarginNoteDeleted?: (id: string) => void;
   style?: ViewStyle;
@@ -61,7 +63,7 @@ export interface TipTapEditorRef {
 }
 
 export const TipTapEditor = React.forwardRef<TipTapEditorRef, TipTapEditorProps>(
-  ({ initialContent, onContentChange, onSelectionChange, onReady, onAnchorPositions, onMarginNoteDeleted, style }, ref) => {
+  ({ initialContent, onContentChange, onSelectionChange, onReady, onFocus, onBlur, onAnchorPositions, onMarginNoteDeleted, style }, ref) => {
     const webViewRef = useRef<WebView>(null);
     const [isReady, setIsReady] = useState(false);
 
@@ -108,11 +110,17 @@ export const TipTapEditor = React.forwardRef<TipTapEditorRef, TipTapEditorProps>
           case 'margin-note-deleted':
             onMarginNoteDeleted?.(data.payload.id);
             break;
+          case 'editor-focus':
+            onFocus?.();
+            break;
+          case 'editor-blur':
+            onBlur?.();
+            break;
         }
       } catch (error) {
         console.warn('Failed to parse message from editor:', error);
       }
-    }, [onContentChange, onSelectionChange, onReady, onAnchorPositions, onMarginNoteDeleted]);
+    }, [onContentChange, onSelectionChange, onReady, onFocus, onBlur, onAnchorPositions, onMarginNoteDeleted]);
 
     // Expose methods via ref
     React.useImperativeHandle(ref, () => ({

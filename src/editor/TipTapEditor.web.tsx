@@ -2,7 +2,7 @@ import React, { useImperativeHandle, forwardRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { StyleSheet, View, ViewStyle } from 'react-native';
-import { Square, Circle, Flower, MarginNote } from '@prose/tiptap-extensions';
+import { Square, Circle, Flower, MarginNote, NoteHighlight } from '@prose/tiptap-extensions';
 import type { TipTapEditorRef, EditorState, EditorContent as EditorContentType, AnchorPosition, SquareAttributes, CircleAttributes, FlowerAttributes } from './TipTapEditor';
 
 export interface TipTapEditorWebProps {
@@ -10,13 +10,15 @@ export interface TipTapEditorWebProps {
   onContentChange?: (content: EditorContentType) => void;
   onSelectionChange?: (state: EditorState) => void;
   onReady?: () => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
   onAnchorPositions?: (positions: AnchorPosition[]) => void;
   onMarginNoteDeleted?: (id: string) => void;
   style?: ViewStyle;
 }
 
 export const TipTapEditorWeb = forwardRef<TipTapEditorRef, TipTapEditorWebProps>(
-  ({ initialContent, onContentChange, onSelectionChange, onReady, onAnchorPositions, onMarginNoteDeleted, style }, ref) => {
+  ({ initialContent, onContentChange, onSelectionChange, onReady, onFocus, onBlur, onAnchorPositions, onMarginNoteDeleted, style }, ref) => {
     // Track previous anchor IDs to detect deletions
     const previousAnchorIdsRef = React.useRef<Set<string>>(new Set());
 
@@ -66,7 +68,7 @@ export const TipTapEditorWeb = forwardRef<TipTapEditorRef, TipTapEditorWebProps>
     }, [getAnchorPositionsFromEditor, onAnchorPositions, onMarginNoteDeleted]);
 
     const editor = useEditor({
-      extensions: [StarterKit, Square, Circle, Flower, MarginNote],
+      extensions: [StarterKit, Square, Circle, Flower, MarginNote, NoteHighlight],
       content: initialContent || '<p>Start typing...</p>',
       onUpdate: ({ editor }) => {
         onContentChange?.({
@@ -89,6 +91,12 @@ export const TipTapEditorWeb = forwardRef<TipTapEditorRef, TipTapEditorWebProps>
       },
       onCreate: () => {
         onReady?.();
+      },
+      onFocus: () => {
+        onFocus?.();
+      },
+      onBlur: () => {
+        onBlur?.();
       },
     });
 

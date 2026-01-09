@@ -2,9 +2,9 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useRef, useState, useCallback } from 'react';
-import { TipTapEditor, TipTapEditorRef, EditorState, EditorContent, AnchorPosition } from './src/editor';
+import { TipTapEditor, TipTapEditorRef, EditorState, EditorContent, AnchorPosition, EditorFocusProvider, useEditorFocus } from './src/editor';
 import { SquareIcon, CircleIcon, FlowerIcon } from './src/components/ShapeIcons';
-import { MarginNotesPanel } from './src/components/MarginNotesPanel';
+import { MarginNotesPanel, MarginNotesPanelRef } from './src/components/MarginNotesPanel';
 
 // Margin note data structure
 interface MarginNoteData {
@@ -20,8 +20,12 @@ function generateId(): string {
 	return Math.random().toString(36).substring(2, 11);
 }
 
-export default function App() {
+// Inner component that uses the focus context
+function AppContent() {
 	const editorRef = useRef<TipTapEditorRef>(null);
+	const notesPanelRef = useRef<MarginNotesPanelRef>(null);
+	const { focusedEditor, setFocusedEditor, isMainEditorFocused, focusedNoteId } = useEditorFocus();
+	
 	const [editorState, setEditorState] = useState<EditorState>({
 		isBold: false,
 		isItalic: false,
@@ -34,7 +38,6 @@ export default function App() {
 
 	// Margin notes state
 	const [marginNotes, setMarginNotes] = useState<MarginNoteData[]>([]);
-	const [noteCounter, setNoteCounter] = useState(1);
 	const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
 
 	const handleContentChange = useCallback((content: EditorContent) => {
@@ -49,6 +52,11 @@ export default function App() {
 		console.log('Editor is ready!');
 	}, []);
 
+	// Track when main editor is focused
+	const handleEditorFocus = useCallback(() => {
+		setFocusedEditor('main');
+	}, [setFocusedEditor]);
+
 	const handleSave = useCallback(async () => {
 		const content = await editorRef.current?.getContent();
 		if (content) {
@@ -58,41 +66,44 @@ export default function App() {
 		}
 	}, [marginNotes]);
 
-	// Insert a new margin note
+	// Insert a new margin note - noteIndex will be calculated dynamically
 	const handleInsertMarginNote = useCallback(() => {
 		const id = generateId();
-		const index = noteCounter;
 		
-		// Insert anchor in editor
-		editorRef.current?.insertMarginNote(id, index);
+		// Insert anchor in editor (noteIndex will be recalculated based on position)
+		editorRef.current?.insertMarginNote(id, 0);
 		
 		// Create note data (line will be updated when we receive anchor positions)
 		setMarginNotes(prev => [...prev, {
 			id,
-			noteIndex: index,
+			noteIndex: 0,
 			content: '',
 			line: 0,
 			blockIndex: 0,
 		}]);
 		
-		setNoteCounter(prev => prev + 1);
 		setSelectedNoteId(id);
-	}, [noteCounter]);
+	}, []);
 
-	// Handle anchor positions update from editor
+	// Handle anchor positions update from editor - this gives us the document order
 	const handleAnchorPositions = useCallback((positions: AnchorPosition[]) => {
-		setMarginNotes(prev => prev.map(note => {
-			const pos = positions.find(p => p.id === note.id);
-			if (pos) {
-				return {
-					...note,
-					noteIndex: pos.noteIndex,
-					line: pos.line,
-					blockIndex: pos.blockIndex,
-				};
-			}
-			return note;
-		}));
+		setMarginNotes(prev => {
+			const sortedPositions = [...positions].sort((a, b) => a.line - b.line);
+			
+			return prev.map(note => {
+				const pos = positions.find(p => p.id === note.id);
+				if (pos) {
+					const dynamicIndex = sortedPositions.findIndex(p => p.id === note.id) + 1;
+					return {
+						...note,
+						noteIndex: dynamicIndex,
+						line: pos.line,
+						blockIndex: pos.blockIndex,
+					};
+				}
+				return note;
+			});
+		});
 	}, []);
 
 	// Handle margin note deleted from editor (anchor was deleted)
@@ -112,109 +123,172 @@ export default function App() {
 
 	// Delete note (from notes panel)
 	const handleNoteDelete = useCallback((id: string) => {
-		// Delete anchor in editor
 		editorRef.current?.deleteMarginNote(id);
-		// Note will be removed when we receive margin-note-deleted message
 	}, []);
 
+	// Toolbar action handlers - route to focused editor
+	const handleToggleBold = useCallback(() => {
+		if (isMainEditorFocused) {
+			editorRef.current?.toggleBold();
+		} else if (focusedNoteId) {
+			notesPanelRef.current?.getNoteEditorRef(focusedNoteId)?.toggleBold();
+		}
+	}, [isMainEditorFocused, focusedNoteId]);
+
+	const handleToggleItalic = useCallback(() => {
+		if (isMainEditorFocused) {
+			editorRef.current?.toggleItalic();
+		} else if (focusedNoteId) {
+			notesPanelRef.current?.getNoteEditorRef(focusedNoteId)?.toggleItalic();
+		}
+	}, [isMainEditorFocused, focusedNoteId]);
+
+	const handleInsertSquare = useCallback(() => {
+		if (isMainEditorFocused) {
+			editorRef.current?.insertSquare();
+		} else if (focusedNoteId) {
+			notesPanelRef.current?.getNoteEditorRef(focusedNoteId)?.insertSquare();
+		}
+	}, [isMainEditorFocused, focusedNoteId]);
+
+	const handleInsertCircle = useCallback(() => {
+		if (isMainEditorFocused) {
+			editorRef.current?.insertCircle();
+		} else if (focusedNoteId) {
+			notesPanelRef.current?.getNoteEditorRef(focusedNoteId)?.insertCircle();
+		}
+	}, [isMainEditorFocused, focusedNoteId]);
+
+	const handleInsertFlower = useCallback(() => {
+		if (isMainEditorFocused) {
+			editorRef.current?.insertFlower();
+		} else if (focusedNoteId) {
+			notesPanelRef.current?.getNoteEditorRef(focusedNoteId)?.insertFlower();
+		}
+	}, [isMainEditorFocused, focusedNoteId]);
+
+	const hasEditorFocus = focusedEditor !== null;
+
+	return (
+		<SafeAreaView style={styles.container}>
+			<StatusBar style="auto" />
+
+			{/* Toolbar */}
+			<View style={styles.toolbar}>
+				<TouchableOpacity
+					style={[
+						styles.toolbarButton, 
+						editorState.isBold && styles.toolbarButtonActive,
+						!hasEditorFocus && styles.toolbarButtonDisabled,
+					]}
+					onPress={handleToggleBold}
+					disabled={!hasEditorFocus}
+				>
+					<Text style={[
+						styles.toolbarButtonText, 
+						editorState.isBold && styles.toolbarButtonTextActive,
+						!hasEditorFocus && styles.toolbarButtonTextDisabled,
+					]}>
+						B
+					</Text>
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					style={[
+						styles.toolbarButton, 
+						editorState.isItalic && styles.toolbarButtonActive,
+						!hasEditorFocus && styles.toolbarButtonDisabled,
+					]}
+					onPress={handleToggleItalic}
+					disabled={!hasEditorFocus}
+				>
+					<Text style={[
+						styles.toolbarButtonText, 
+						editorState.isItalic && styles.toolbarButtonTextActive, 
+						{ fontStyle: 'italic' },
+						!hasEditorFocus && styles.toolbarButtonTextDisabled,
+					]}>
+						I
+					</Text>
+				</TouchableOpacity>
+
+				<View style={styles.separator} />
+
+				<Text style={styles.sectionLabel}>Shapes:</Text>
+				<TouchableOpacity
+					style={[styles.shapeButton, !hasEditorFocus && styles.toolbarButtonDisabled]}
+					onPress={handleInsertSquare}
+					disabled={!hasEditorFocus}
+				>
+					<SquareIcon size={20} color={hasEditorFocus ? undefined : '#ccc'} />
+				</TouchableOpacity>
+				<TouchableOpacity
+					style={[styles.shapeButton, !hasEditorFocus && styles.toolbarButtonDisabled]}
+					onPress={handleInsertCircle}
+					disabled={!hasEditorFocus}
+				>
+					<CircleIcon size={20} color={hasEditorFocus ? undefined : '#ccc'} />
+				</TouchableOpacity>
+				<TouchableOpacity
+					style={[styles.shapeButton, !hasEditorFocus && styles.toolbarButtonDisabled]}
+					onPress={handleInsertFlower}
+					disabled={!hasEditorFocus}
+				>
+					<FlowerIcon size={20} color={hasEditorFocus ? 'lightgray' : '#ccc'} />
+				</TouchableOpacity>
+
+				<View style={styles.separator} />
+
+				<TouchableOpacity
+					style={[styles.noteButton, !isMainEditorFocused && styles.toolbarButtonDisabled]}
+					onPress={handleInsertMarginNote}
+					disabled={!isMainEditorFocused}
+				>
+					<Text style={[styles.noteButtonText, !isMainEditorFocused && { opacity: 0.4 }]}>📝</Text>
+				</TouchableOpacity>
+
+				<View style={{ flex: 1 }} />
+
+				<TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+					<Text style={styles.saveButtonText}>Save</Text>
+				</TouchableOpacity>
+			</View>
+
+			{/* Editor Container */}
+			<View style={styles.editorContainer}>
+				<TipTapEditor
+					ref={editorRef}
+					initialContent="<p>Hello from <strong>TipTap</strong> in React Native!</p>"
+					onContentChange={handleContentChange}
+					onSelectionChange={handleSelectionChange}
+					onReady={handleReady}
+					onFocus={handleEditorFocus}
+					onAnchorPositions={handleAnchorPositions}
+					onMarginNoteDeleted={handleMarginNoteDeleted}
+					style={styles.editor}
+				/>
+
+				<View style={styles.notesPanel}>
+					<MarginNotesPanel
+						ref={notesPanelRef}
+						notes={marginNotes}
+						onNoteChange={handleNoteContentChange}
+						onNoteDelete={handleNoteDelete}
+						selectedNoteId={selectedNoteId}
+						onNoteSelect={setSelectedNoteId}
+					/>
+				</View>
+			</View>
+		</SafeAreaView>
+	);
+}
+
+export default function App() {
 	return (
 		<SafeAreaProvider>
-			<SafeAreaView style={styles.container}>
-				<StatusBar style="auto" />
-
-				{/* Toolbar */}
-				<View style={styles.toolbar}>
-					<TouchableOpacity
-						style={[styles.toolbarButton, editorState.isBold && styles.toolbarButtonActive]}
-						onPress={() => editorRef.current?.toggleBold()}
-					>
-						<Text style={[styles.toolbarButtonText, editorState.isBold && styles.toolbarButtonTextActive]}>
-							B
-						</Text>
-					</TouchableOpacity>
-
-					<TouchableOpacity
-						style={[styles.toolbarButton, editorState.isItalic && styles.toolbarButtonActive]}
-						onPress={() => editorRef.current?.toggleItalic()}
-					>
-						<Text style={[styles.toolbarButtonText, editorState.isItalic && styles.toolbarButtonTextActive, { fontStyle: 'italic' }]}>
-							I
-						</Text>
-					</TouchableOpacity>
-
-					{/* Separator */}
-					<View style={styles.separator} />
-
-					{/* Shapes Section */}
-					<Text style={styles.sectionLabel}>Shapes:</Text>
-					<TouchableOpacity
-						style={styles.shapeButton}
-						onPress={() => editorRef.current?.insertSquare()}
-					>
-						<SquareIcon size={20} />
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={styles.shapeButton}
-						onPress={() => editorRef.current?.insertCircle()}
-					>
-						<CircleIcon size={20} />
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={styles.shapeButton}
-						onPress={() => editorRef.current?.insertFlower()}
-					>
-						<FlowerIcon size={20} color='lightgray'/>
-					</TouchableOpacity>
-
-					{/* Separator */}
-					<View style={styles.separator} />
-
-					{/* Margin Note Button */}
-					<TouchableOpacity
-						style={styles.noteButton}
-						onPress={handleInsertMarginNote}
-					>
-						<Text style={styles.noteButtonText}>📝</Text>
-					</TouchableOpacity>
-
-					{/* Spacer */}
-					<View style={{ flex: 1 }} />
-
-					{/* Save Button */}
-					<TouchableOpacity
-						style={styles.saveButton}
-						onPress={handleSave}
-					>
-						<Text style={styles.saveButtonText}>Save</Text>
-					</TouchableOpacity>
-				</View>
-
-				{/* Editor Container - Side by side layout */}
-				<View style={styles.editorContainer}>
-					{/* Main Editor */}
-					<TipTapEditor
-						ref={editorRef}
-						initialContent="<p>Hello from <strong>TipTap</strong> in React Native!</p>"
-						onContentChange={handleContentChange}
-						onSelectionChange={handleSelectionChange}
-						onReady={handleReady}
-						onAnchorPositions={handleAnchorPositions}
-						onMarginNoteDeleted={handleMarginNoteDeleted}
-						style={styles.editor}
-					/>
-
-					{/* Margin Notes Panel */}
-					<View style={styles.notesPanel}>
-						<MarginNotesPanel
-							notes={marginNotes}
-							onNoteChange={handleNoteContentChange}
-							onNoteDelete={handleNoteDelete}
-							selectedNoteId={selectedNoteId}
-							onNoteSelect={setSelectedNoteId}
-						/>
-					</View>
-				</View>
-			</SafeAreaView>
+			<EditorFocusProvider>
+				<AppContent />
+			</EditorFocusProvider>
 		</SafeAreaProvider>
 	);
 }
@@ -243,6 +317,9 @@ const styles = StyleSheet.create({
 	toolbarButtonActive: {
 		backgroundColor: '#007AFF',
 	},
+	toolbarButtonDisabled: {
+		opacity: 0.5,
+	},
 	toolbarButtonText: {
 		fontSize: 16,
 		fontWeight: 'bold',
@@ -250,6 +327,9 @@ const styles = StyleSheet.create({
 	},
 	toolbarButtonTextActive: {
 		color: '#fff',
+	},
+	toolbarButtonTextDisabled: {
+		color: '#999',
 	},
 	separator: {
 		width: 1,
@@ -269,21 +349,6 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		alignItems: 'center',
 		justifyContent: 'center',
-	},
-	squareIcon: {
-		width: 18,
-		height: 18,
-		borderWidth: 2,
-		borderColor: '#333',
-		backgroundColor: 'transparent',
-	},
-	circleIcon: {
-		width: 18,
-		height: 18,
-		borderWidth: 2,
-		borderColor: '#333',
-		borderRadius: 9,
-		backgroundColor: 'transparent',
 	},
 	editor: {
 		flex: 2,
@@ -307,6 +372,13 @@ const styles = StyleSheet.create({
 	},
 	noteButtonText: {
 		fontSize: 18,
+	},
+	focusIndicator: {
+		marginLeft: 8,
+		padding: 4,
+	},
+	focusIndicatorText: {
+		fontSize: 16,
 	},
 	saveButton: {
 		padding: 8,

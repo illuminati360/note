@@ -145,15 +145,51 @@ export const MarginNote = Node.create<MarginNoteOptions>({
     return {
       insertMarginNote:
         (id: string, noteIndex: number) =>
-        ({ commands }) => {
-          return commands.insertContent({
-            type: this.name,
-            attrs: { id, noteIndex },
-          });
+        ({ chain, state }) => {
+          const { from, to, empty } = state.selection;
+          
+          if (empty) {
+            // No selection - just insert the anchor at cursor
+            return chain()
+              .insertContent({
+                type: this.name,
+                attrs: { id, noteIndex },
+              })
+              .run();
+          } else {
+            // Has selection - apply note highlight with noteId, then insert anchor at end
+            return chain()
+              .setMark('noteHighlight', { noteId: id })  // Apply highlight linked to this note
+              .setTextSelection(to)   // Move cursor to end of selection
+              .insertContent({
+                type: this.name,
+                attrs: { id, noteIndex },
+              })
+              .run();
+          }
         },
       deleteMarginNote:
         (id: string) =>
-        ({ tr, state, dispatch }) => {
+        ({ tr, state, dispatch, commands }) => {
+          // First, remove the associated highlight
+          const markType = state.schema.marks['noteHighlight'];
+          if (markType) {
+            state.doc.descendants((node, pos) => {
+              if (!node.isText) return;
+              
+              const marks = node.marks.filter(mark => 
+                mark.type === markType && mark.attrs.noteId === id
+              );
+
+              if (marks.length > 0) {
+                marks.forEach(mark => {
+                  tr.removeMark(pos, pos + node.nodeSize, mark);
+                });
+              }
+            });
+          }
+
+          // Then, delete the anchor node
           let deleted = false;
           state.doc.descendants((node, pos) => {
             if (node.type.name === this.name && node.attrs.id === id) {
@@ -163,7 +199,8 @@ export const MarginNote = Node.create<MarginNoteOptions>({
               }
             }
           });
-          if (dispatch && deleted) {
+          
+          if (dispatch) {
             dispatch(tr);
           }
           return deleted;

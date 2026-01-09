@@ -1,0 +1,305 @@
+# TipTap React Native POC - Project Context
+# Use this file to onboard AI agents for continued development
+# Last updated: January 9, 2026
+
+project:
+  name: tiptap-rn-poc
+  description: A proof-of-concept rich text editor for React Native using TipTap
+  repository:
+    owner: illuminati360
+    name: note
+    branch: main
+
+# ============================================================================
+# ARCHITECTURE OVERVIEW
+# ============================================================================
+
+architecture:
+  pattern: WebView Bridge
+  description: |
+    The app uses a hybrid architecture where TipTap editor runs inside a WebView,
+    and React Native communicates with it via postMessage/onMessage bridge.
+    This approach is necessary because TipTap relies on ProseMirror which requires
+    a real DOM environment.
+
+  components:
+    react_native_app:
+      entry: index.ts
+      main_component: App.tsx
+      description: Expo-based React Native app that hosts the editor
+
+    editor_web:
+      path: editor-web/
+      build_tool: Vite with vite-plugin-singlefile
+      description: |
+        Standalone web build of TipTap editor that gets bundled into a single HTML file.
+        This HTML is then embedded in the React Native WebView.
+      key_files:
+        - src/main.ts  # TipTap editor initialization and message handling
+        - index.html
+        - vite.config.ts
+
+    tiptap_extensions:
+      path: packages/tiptap-extensions/
+      package_name: "@prose/tiptap-extensions"
+      description: Custom TipTap Node extensions shared between web and native
+      extensions:
+        - name: MarginNote
+          type: inline node (atom)
+          description: |
+            Inline anchor badges (numbered circles) that mark positions in the document.
+            Each anchor links to a margin note displayed in a side panel.
+        - name: NoteHighlight
+          type: mark
+          description: Highlight text associated with margin notes
+        - name: Square
+          type: inline node
+          description: Decorative square shape
+        - name: Circle
+          type: inline node
+          description: Decorative circle shape
+        - name: Flower
+          type: inline node
+          description: Decorative flower shape
+
+    editor_components:
+      path: src/editor/
+      description: Platform-specific editor wrappers with unified API
+      files:
+        - name: TipTapEditor.tsx
+          platform: native
+          description: WebView-based editor for iOS/Android
+        - name: TipTapEditor.web.tsx
+          platform: web
+          description: Direct TipTap integration for web platform
+        - name: NoteEditor.tsx
+          platform: native
+          description: Smaller editor for margin note content
+        - name: NoteEditor.web.tsx
+          platform: web
+          description: Web version of margin note editor
+        - name: AsyncMessages.ts
+          description: |
+            Manages request/response matching for async WebView communication.
+            Solves the problem of correlating responses to specific requests
+            when multiple concurrent operations are in flight.
+        - name: EditorFocusContext.tsx
+          description: |
+            React context for tracking which editor (main or which note) has focus.
+            Important for applying formatting commands to the correct editor.
+        - name: editorHtml.ts
+          description: Contains the bundled HTML string for the WebView
+
+    ui_components:
+      path: src/components/
+      files:
+        - name: MarginNotesPanel.tsx
+          description: |
+            Side panel displaying margin notes. Notes are positioned to align
+            with their anchor positions in the main editor. Handles dynamic
+            reordering when anchors are moved in the document.
+        - name: ShapeIcons.tsx
+          description: React Native SVG icons for shape toolbar buttons
+
+# ============================================================================
+# KEY FEATURES IMPLEMENTED
+# ============================================================================
+
+features:
+  margin_notes:
+    status: implemented
+    description: |
+      Academic-style margin notes system similar to LaTeX \marginpar.
+      Users can insert numbered anchors in the document that link to
+      notes displayed in a right-side panel.
+    behavior:
+      - Anchors display as small numbered circles (1, 2, 3...)
+      - Note indices are dynamically recalculated based on document position
+      - Notes in the panel try to align vertically with their anchors
+      - When anchors are reordered (cut/paste), indices update automatically
+      - Each note has its own mini TipTap editor for rich text content
+
+  webview_bridge:
+    status: implemented
+    description: Bidirectional communication between RN and WebView
+    message_types:
+      outgoing_to_webview:
+        - SET_CONTENT: Initialize editor with HTML content
+        - GET_CONTENT: Request current editor content
+        - TOGGLE_BOLD/ITALIC/etc: Formatting commands
+        - INSERT_MARGIN_NOTE: Insert anchor at cursor position
+        - DELETE_MARGIN_NOTE: Remove anchor by ID
+        - GET_ANCHOR_POSITIONS: Request positions of all margin note anchors
+      incoming_from_webview:
+        - CONTENT_CHANGED: Editor content was modified
+        - SELECTION_CHANGED: Cursor/selection state changed (for toolbar)
+        - CONTENT_RESPONSE: Response to GET_CONTENT request
+        - ANCHOR_POSITIONS: Positions of margin note anchors
+        - READY: Editor finished initializing
+
+  async_message_handling:
+    status: implemented
+    description: |
+      AsyncMessages class provides Promise-based API for WebView calls.
+      Each request gets a unique messageId, and responses are matched
+      back to their originating Promises. Includes timeout handling.
+
+  platform_specific_exports:
+    status: implemented
+    description: |
+      The src/editor/index.ts uses Platform.select() to export the
+      appropriate component (WebView-based or direct TipTap) based
+      on the runtime platform.
+
+  focus_management:
+    status: implemented
+    description: |
+      EditorFocusContext tracks whether the main editor or a specific
+      note editor has focus. Toolbar commands are routed to the
+      currently focused editor.
+
+# ============================================================================
+# TECHNICAL DECISIONS & DISCUSSIONS
+# ============================================================================
+
+decisions:
+  - topic: Why WebView for TipTap?
+    decision: Use WebView bridge pattern
+    rationale: |
+      TipTap is built on ProseMirror which requires a real DOM.
+      React Native doesn't have a DOM, so we embed a web-based
+      editor in a WebView and communicate via postMessage.
+      Alternative approaches like react-native-pell-rich-editor
+      were considered but lack TipTap's extensibility.
+
+  - topic: Single HTML file bundling
+    decision: Use vite-plugin-singlefile
+    rationale: |
+      The WebView needs to load the editor. Instead of hosting it
+      on a server, we bundle everything (JS, CSS) into a single
+      HTML file that can be loaded directly via the source.html prop.
+
+  - topic: Margin note indexing
+    decision: Dynamic index calculation based on document order
+    rationale: |
+      Initially considered storing noteIndex as a fixed attribute,
+      but this breaks when users cut/paste content. Instead, we
+      query anchor positions from the editor and sort by line number
+      to calculate indices dynamically.
+
+  - topic: Multiple editors and focus
+    decision: EditorFocusContext pattern
+    rationale: |
+      The app has one main editor and multiple note editors.
+      When user presses Bold in toolbar, we need to know which
+      editor should receive the command. The context tracks
+      the focused editor ID.
+
+  - topic: Shared extensions package
+    decision: Monorepo with packages/tiptap-extensions
+    rationale: |
+      The same TipTap extensions need to work in both the web
+      bundle (editor-web) and potentially in web platform builds.
+      A shared package with proper exports avoids duplication.
+
+# ============================================================================
+# DEVELOPMENT WORKFLOW
+# ============================================================================
+
+development:
+  prerequisites:
+    - Node.js (for npm/yarn)
+    - Expo CLI
+    - iOS Simulator or Android Emulator (for mobile testing)
+
+  setup:
+    - command: yarn install
+      description: Install all dependencies (uses yarn workspaces)
+    - command: cd packages/tiptap-extensions && yarn build
+      description: Build the extensions package
+    - command: cd editor-web && yarn build
+      description: Build the web editor bundle (generates HTML for WebView)
+
+  running:
+    - command: yarn start
+      description: Start Expo dev server
+    - command: yarn ios
+      description: Run on iOS simulator
+    - command: yarn android
+      description: Run on Android emulator
+    - command: yarn web
+      description: Run web version
+
+  after_editor_changes:
+    description: |
+      If you modify anything in editor-web/ (including extensions),
+      you must rebuild the web bundle and update editorHtml.ts:
+    steps:
+      - cd editor-web && yarn build
+      - Copy the built HTML into src/editor/editorHtml.ts
+
+# ============================================================================
+# KNOWN ISSUES & TODO
+# ============================================================================
+
+known_issues:
+  - issue: Editor HTML must be manually copied after rebuild
+    severity: minor
+    notes: Could automate with a build script
+
+  - issue: Note panel vertical alignment is approximate
+    severity: minor
+    notes: |
+      The LINE_HEIGHT constant (24px) is hardcoded. Should ideally
+      be calculated from actual editor line measurements.
+
+future_work:
+  - Persist notes to storage/backend
+  - Export to LaTeX with \marginpar
+  - Collaborative editing support
+  - Better keyboard handling on mobile
+  - Undo/redo across WebView bridge
+
+# ============================================================================
+# FILE REFERENCE QUICK GUIDE
+# ============================================================================
+
+quick_reference:
+  to_add_new_tiptap_extension:
+    - Create extension in packages/tiptap-extensions/src/extensions/
+    - Export from packages/tiptap-extensions/src/index.ts
+    - Import in editor-web/src/main.ts and add to extensions array
+    - Rebuild: cd packages/tiptap-extensions && yarn build
+    - Rebuild: cd editor-web && yarn build
+    - Update editorHtml.ts with new bundle
+
+  to_add_new_toolbar_button:
+    - Add button UI in App.tsx toolbar section
+    - Add message type in TipTapEditor.tsx (sendMessage function)
+    - Handle message in editor-web/src/main.ts (message listener)
+    - Add command execution using editor.chain()
+
+  to_modify_margin_notes_behavior:
+    - Anchor rendering: packages/tiptap-extensions/src/extensions/MarginNote.ts
+    - Panel UI: src/components/MarginNotesPanel.tsx
+    - Position tracking: editor-web/src/main.ts (getAnchorPositions)
+    - State management: App.tsx (marginNotes state, handleAnchorPositions)
+
+# ============================================================================
+# DEPENDENCIES SUMMARY
+# ============================================================================
+
+dependencies:
+  core:
+    - expo: ~54.0.31
+    - react: 19.1.0
+    - react-native: 0.81.5
+    - react-native-webview: 13.15.0
+    - "@tiptap/core": ^3.14.0
+    - "@tiptap/starter-kit": ^3.14.0
+
+  build_tools:
+    - vite: ^7.3.0
+    - vite-plugin-singlefile: ^2.3.0
+    - tsup: ^8.0.0 (for extensions package)
+    - typescript: ~5.9.2

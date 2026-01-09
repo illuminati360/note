@@ -1,6 +1,6 @@
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
-import { Square, Circle, Flower, MarginNote } from '@prose/tiptap-extensions';
+import { Square, Circle, Flower, MarginNote, NoteHighlight } from '@prose/tiptap-extensions';
 
 // Declare the ReactNativeWebView interface for type safety
 declare global {
@@ -15,7 +15,7 @@ declare global {
 
 // Message types for communication with React Native
 type MessageToRN = {
-  type: 'content-change' | 'content-response' | 'editor-ready' | 'selection-change' | 'anchor-positions' | 'margin-note-deleted';
+  type: 'content-change' | 'content-response' | 'editor-ready' | 'selection-change' | 'anchor-positions' | 'margin-note-deleted' | 'editor-focus' | 'editor-blur';
   payload: any;
 };
 
@@ -37,7 +37,7 @@ function initEditor() {
   
   const editor = new Editor({
     element: document.getElementById('editor')!,
-    extensions: [StarterKit, Square, Circle, Flower, MarginNote],
+    extensions: [StarterKit, Square, Circle, Flower, MarginNote, NoteHighlight],
     content: initialContent,
     onUpdate: ({ editor }) => {
       sendToRN({
@@ -60,6 +60,18 @@ function initEditor() {
           isOrderedList: editor.isActive('orderedList'),
           isHeading: editor.isActive('heading'),
         },
+      });
+    },
+    onFocus: () => {
+      sendToRN({
+        type: 'editor-focus',
+        payload: {},
+      });
+    },
+    onBlur: () => {
+      sendToRN({
+        type: 'editor-blur',
+        payload: {},
       });
     },
   });
