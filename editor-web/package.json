@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "vite build",
+    "build": "npm run build:main && npm run build:margin",
+    "build:main": "vite build",
+    "build:margin": "vite build --config vite.margin.config.ts",
     "dev": "vite",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

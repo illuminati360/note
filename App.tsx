@@ -1,16 +1,15 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { TipTapEditor, TipTapEditorRef, EditorState, EditorContent, AnchorPosition, EditorFocusProvider, useEditorFocus } from './src/editor';
 import { SquareIcon, CircleIcon, FlowerIcon } from './src/components/ShapeIcons';
-import { MarginNotesPanel, MarginNotesPanelRef } from './src/components/MarginNotesPanel';
+import { MarginNotesPanel, MarginNotesPanelRef } from './src/components/MarginNotesPanelNew';
 
-// Margin note data structure
+// Margin note data structure (for tracking anchors in main editor)
 interface MarginNoteData {
 	id: string;
 	noteIndex: number;
-	content: string;
 	line: number;
 	blockIndex: number;
 }
@@ -69,28 +68,31 @@ function AppContent() {
 	// Insert a new margin note - noteIndex will be calculated dynamically
 	const handleInsertMarginNote = useCallback(() => {
 		const id = generateId();
+		const noteIndex = marginNotes.length + 1;
 		
-		// Insert anchor in editor (noteIndex will be recalculated based on position)
-		editorRef.current?.insertMarginNote(id, 0);
+		// Insert anchor in main editor
+		editorRef.current?.insertMarginNote(id, noteIndex);
 		
-		// Create note data (line will be updated when we receive anchor positions)
+		// Insert note block in margin editor
+		notesPanelRef.current?.insertNoteBlock(id, noteIndex);
+		
+		// Track the note data
 		setMarginNotes(prev => [...prev, {
 			id,
-			noteIndex: 0,
-			content: '',
+			noteIndex,
 			line: 0,
 			blockIndex: 0,
 		}]);
 		
 		setSelectedNoteId(id);
-	}, []);
+	}, [marginNotes.length]);
 
 	// Handle anchor positions update from editor - this gives us the document order
 	const handleAnchorPositions = useCallback((positions: AnchorPosition[]) => {
 		setMarginNotes(prev => {
 			const sortedPositions = [...positions].sort((a, b) => a.line - b.line);
 			
-			return prev.map(note => {
+			const updatedNotes = prev.map(note => {
 				const pos = positions.find(p => p.id === note.id);
 				if (pos) {
 					const dynamicIndex = sortedPositions.findIndex(p => p.id === note.id) + 1;
@@ -103,43 +105,53 @@ function AppContent() {
 				}
 				return note;
 			});
+
+			// Update the margin editor with new indices
+			notesPanelRef.current?.updateNoteIndices(updatedNotes);
+
+			return updatedNotes;
 		});
 	}, []);
 
 	// Handle margin note deleted from editor (anchor was deleted)
 	const handleMarginNoteDeleted = useCallback((id: string) => {
+		// Delete from margin editor
+		notesPanelRef.current?.deleteNoteBlock(id);
+		
+		// Update state
 		setMarginNotes(prev => prev.filter(note => note.id !== id));
 		if (selectedNoteId === id) {
 			setSelectedNoteId(null);
 		}
 	}, [selectedNoteId]);
 
-	// Update note content
-	const handleNoteContentChange = useCallback((id: string, content: string) => {
-		setMarginNotes(prev => prev.map(note => 
-			note.id === id ? { ...note, content } : note
-		));
+	// Handle content change from margin editor
+	const handleMarginContentChange = useCallback((content: string) => {
+		console.log('Margin notes content:', content);
 	}, []);
 
-	// Delete note (from notes panel)
-	const handleNoteDelete = useCallback((id: string) => {
-		editorRef.current?.deleteMarginNote(id);
+	// Handle note block focus in margin editor
+	const handleNoteBlockFocus = useCallback((noteId: string | null) => {
+		setSelectedNoteId(noteId);
 	}, []);
 
 	// Toolbar action handlers - route to focused editor
 	const handleToggleBold = useCallback(() => {
+		console.log('handleToggleBold - isMainEditorFocused:', isMainEditorFocused, 'focusedNoteId:', focusedNoteId, 'focusedEditor:', focusedEditor);
 		if (isMainEditorFocused) {
 			editorRef.current?.toggleBold();
 		} else if (focusedNoteId) {
-			notesPanelRef.current?.getNoteEditorRef(focusedNoteId)?.toggleBold();
+			const marginEditor = notesPanelRef.current?.getMarginEditorRef();
+			console.log('marginEditor ref:', !!marginEditor);
+			marginEditor?.toggleBold();
 		}
-	}, [isMainEditorFocused, focusedNoteId]);
+	}, [isMainEditorFocused, focusedNoteId, focusedEditor]);
 
 	const handleToggleItalic = useCallback(() => {
 		if (isMainEditorFocused) {
 			editorRef.current?.toggleItalic();
 		} else if (focusedNoteId) {
-			notesPanelRef.current?.getNoteEditorRef(focusedNoteId)?.toggleItalic();
+			notesPanelRef.current?.getMarginEditorRef()?.toggleItalic();
 		}
 	}, [isMainEditorFocused, focusedNoteId]);
 
@@ -147,7 +159,7 @@ function AppContent() {
 		if (isMainEditorFocused) {
 			editorRef.current?.insertSquare();
 		} else if (focusedNoteId) {
-			notesPanelRef.current?.getNoteEditorRef(focusedNoteId)?.insertSquare();
+			notesPanelRef.current?.getMarginEditorRef()?.insertSquare();
 		}
 	}, [isMainEditorFocused, focusedNoteId]);
 
@@ -155,7 +167,7 @@ function AppContent() {
 		if (isMainEditorFocused) {
 			editorRef.current?.insertCircle();
 		} else if (focusedNoteId) {
-			notesPanelRef.current?.getNoteEditorRef(focusedNoteId)?.insertCircle();
+			notesPanelRef.current?.getMarginEditorRef()?.insertCircle();
 		}
 	}, [isMainEditorFocused, focusedNoteId]);
 
@@ -163,7 +175,7 @@ function AppContent() {
 		if (isMainEditorFocused) {
 			editorRef.current?.insertFlower();
 		} else if (focusedNoteId) {
-			notesPanelRef.current?.getNoteEditorRef(focusedNoteId)?.insertFlower();
+			notesPanelRef.current?.getMarginEditorRef()?.insertFlower();
 		}
 	}, [isMainEditorFocused, focusedNoteId]);
 
@@ -272,10 +284,8 @@ function AppContent() {
 					<MarginNotesPanel
 						ref={notesPanelRef}
 						notes={marginNotes}
-						onNoteChange={handleNoteContentChange}
-						onNoteDelete={handleNoteDelete}
-						selectedNoteId={selectedNoteId}
-						onNoteSelect={setSelectedNoteId}
+						onContentChange={handleMarginContentChange}
+						onNoteBlockFocus={handleNoteBlockFocus}
 					/>
 				</View>
 			</View>

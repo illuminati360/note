@@ -2,6 +2,7 @@ import { Platform } from 'react-native';
 
 export type { TipTapEditorRef, TipTapEditorProps, EditorState, EditorContent, AnchorPosition } from './TipTapEditor';
 export type { NoteEditorRef, NoteEditorProps } from './NoteEditor';
+export type { MarginEditorRef, MarginEditorProps } from './MarginEditor';
 export { editorHtml } from './editorHtml';
 export { EditorFocusProvider, useEditorFocus, type FocusedEditor } from './EditorFocusContext';
 
@@ -14,4 +15,9 @@ export const TipTapEditor = Platform.select({
 export const NoteEditor = Platform.select({
   web: () => require('./NoteEditor.web').NoteEditor,
   default: () => require('./NoteEditor').NoteEditor,
+})();
+
+export const MarginEditor = Platform.select({
+  web: () => require('./MarginEditor.web').MarginEditor,
+  default: () => require('./MarginEditor').MarginEditor,
 })();
