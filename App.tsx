@@ -4,7 +4,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { TipTapEditor, TipTapEditorRef, EditorState, EditorContent, AnchorPosition, EditorFocusProvider, useEditorFocus } from './src/editor';
 import { SquareIcon, CircleIcon, FlowerIcon } from './src/components/ShapeIcons';
-import { MarginNotesPanel, MarginNotesPanelRef } from './src/components/MarginNotesPanelNew';
+import { MarginNotesPanel, MarginNotesPanelRef } from './src/components/MarginNotesPanel';
 
 // Margin note data structure (for tracking anchors in main editor)
 interface MarginNoteData {
