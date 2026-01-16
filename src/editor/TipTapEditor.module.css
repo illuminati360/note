@@ -1,0 +1,34 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  width: 100%;
+  background-color: #fff;
+}
+
+/* :global() targets TipTap's generated class names which we can't control */
+.wrapper :global(.tiptap) {
+  flex: 1;
+  outline: none;
+  padding: 16px;
+  min-height: 100%;
+  cursor: text;
+}
+
+.wrapper :global(.tiptap):focus {
+  outline: none;
+}
+
+.wrapper :global(.tiptap) p {
+  margin: 0 0 1em 0;
+}
+
+/* Placeholder for empty editor */
+.wrapper :global(.tiptap) p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}

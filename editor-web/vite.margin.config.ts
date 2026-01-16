@@ -7,11 +7,16 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     target: 'es2015',
+    minify: 'esbuild',
     rollupOptions: {
       input: resolve(__dirname, 'margin.html'),
     },
     // Don't empty the dist folder (main build already created index.html there)
     emptyOutDir: false,
+  },
+  esbuild: {
+    // Keep console.log for debugging
+    drop: [],
   },
   plugins: [viteSingleFile()],
 });

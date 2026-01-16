@@ -1,48 +1,14 @@
-import React, { useImperativeHandle, forwardRef, useEffect, useRef, useCallback } from 'react';
+import { useImperativeHandle, forwardRef, useEffect, useRef, useCallback } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { StyleSheet, View, ViewStyle, Text } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import { Square, Circle, Flower, MarginNoteBlock } from '@prose/tiptap-extensions';
 import type { EditorState, EditorContent as EditorContentType, SquareAttributes, CircleAttributes, FlowerAttributes } from './TipTapEditor';
+import type { MarginEditorRef, MarginEditorProps } from './MarginEditor';
 import { useEditorFocus } from './EditorFocusContext';
 
-// Ref interface for the margin editor
-export interface MarginEditorRef {
-  // Content management
-  getContent: () => Promise<EditorContentType | null>;
-  setContent: (content: string) => void;
-  
-  // Note block management
-  insertNoteBlock: (noteId: string, noteIndex: number) => void;
-  deleteNoteBlock: (noteId: string) => void;
-  updateNoteBlockIndex: (noteId: string, noteIndex: number) => void;
-  updateAllNoteBlockIndices: (indices: { noteId: string; noteIndex: number }[]) => void;
-  
-  // Focus management
-  focus: () => void;
-  blur: () => void;
-  focusNoteBlock: (noteId: string) => void;
-  
-  // Formatting
-  toggleBold: () => void;
-  toggleItalic: () => void;
-  insertSquare: (attrs?: SquareAttributes) => void;
-  insertCircle: (attrs?: CircleAttributes) => void;
-  insertFlower: (attrs?: FlowerAttributes) => void;
-}
-
-export interface MarginEditorProps {
-  initialContent?: string;
-  onContentChange?: (content: EditorContentType) => void;
-  onSelectionChange?: (state: EditorState) => void;
-  onFocus?: () => void;
-  onBlur?: () => void;
-  onNoteBlockFocus?: (noteId: string | null) => void;
-  style?: ViewStyle;
-}
-
 export const MarginEditor = forwardRef<MarginEditorRef, MarginEditorProps>(
-  ({ initialContent, onContentChange, onSelectionChange, onFocus, onBlur, onNoteBlockFocus, style }, ref) => {
+  ({ initialContent, onContentChange, onSelectionChange, onFocus, onBlur, onNoteBlockFocus, onDeleteNote, style }, ref) => {
     const { setFocusedEditor } = useEditorFocus();
     const lastFocusedNoteId = useRef<string | null>(null);
 
@@ -56,7 +22,11 @@ export const MarginEditor = forwardRef<MarginEditorRef, MarginEditorProps>(
         Square,
         Circle,
         Flower,
-        MarginNoteBlock,
+        MarginNoteBlock.configure({
+          onDeleteNote: (noteId: string) => {
+            onDeleteNote?.(noteId);
+          },
+        }),
       ],
       content: initialContent || '',
       onUpdate: ({ editor }) => {
@@ -75,6 +45,11 @@ export const MarginEditor = forwardRef<MarginEditorRef, MarginEditorProps>(
           isOrderedList: editor.isActive('orderedList'),
           isHeading: false,
         });
+
+        // Only detect note block focus if the editor actually has focus
+        if (!editor.isFocused) {
+          return;
+        }
 
         // Detect which note block has the cursor
         const { $from } = editor.state.selection;
@@ -174,7 +149,8 @@ export const MarginEditor = forwardRef<MarginEditorRef, MarginEditorProps>(
           editor.chain().insertMarginNoteBlock(noteId, noteIndex).run();
           
           // After insertion, find and focus the new note block
-          // Need to search for it since position changed
+          // The onSelectionUpdate/onFocus handlers will detect the note block
+          // and update the focus state automatically
           const { doc } = editor.state;
           let targetPos: number | null = null;
 
@@ -187,14 +163,8 @@ export const MarginEditor = forwardRef<MarginEditorRef, MarginEditorProps>(
           });
 
           if (targetPos !== null) {
+            // Focus and move cursor - onSelectionUpdate will handle setFocusedEditor
             editor.chain().focus().setTextSelection(targetPos).run();
-            // Manually set the focused editor since we know which note
-            lastFocusedNoteId.current = noteId;
-            onNoteBlockFocus?.(noteId);
-            setFocusedEditor(noteId);
-            console.log('insertNoteBlock: set focusedEditor to', noteId);
-          } else {
-            console.log('insertNoteBlock: could not find note block', noteId);
           }
         }
       },
@@ -260,13 +230,12 @@ export const MarginEditor = forwardRef<MarginEditorRef, MarginEditorProps>(
     return (
       <View style={[styles.container, style]}>
         {!hasNotes && (
-          <View style={styles.emptyState} pointerEvents="none">
-            <Text style={styles.emptyText}>No notes</Text>
-            <Text style={styles.emptyHint}>Click 📝 to add a note</Text>
+          <View style={[styles.emptyState, { pointerEvents: 'none' }]}>
+            <Text style={styles.emptyText}>Margin Notes</Text>
           </View>
         )}
         <View style={styles.editorWrapper}>
-          <EditorContent editor={editor} style={styles.editorContent} />
+          <EditorContent editor={editor} />
         </View>
       </View>
     );
@@ -283,9 +252,6 @@ const styles = StyleSheet.create({
   editorWrapper: {
     flex: 1,
   },
-  editorContent: {
-    flex: 1,
-  } as any,
   emptyState: {
     position: 'absolute',
     top: 0,
@@ -295,15 +261,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1,
-  } as any,
+  },
   emptyText: {
     fontSize: 14,
     color: '#666',
-    marginBottom: 4,
-  },
-  emptyHint: {
-    fontSize: 12,
-    color: '#999',
   },
 });
 

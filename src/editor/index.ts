@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 
-export type { TipTapEditorRef, TipTapEditorProps, EditorState, EditorContent, AnchorPosition } from './TipTapEditor';
+export type { TipTapEditorRef, TipTapEditorProps, EditorState, EditorContent, MarginNoteData } from './TipTapEditor';
 export type { MarginEditorRef, MarginEditorProps } from './MarginEditor';
 export { editorHtml } from './editorHtml';
 export { EditorFocusProvider, useEditorFocus, type FocusedEditor } from './EditorFocusContext';

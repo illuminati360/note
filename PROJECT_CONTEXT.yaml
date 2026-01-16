@@ -1,10 +1,17 @@
 # TipTap React Native POC - Project Context
 # Use this file to onboard AI agents for continued development
-# Last updated: January 9, 2026
+# Last updated: Session refactored multiple NoteEditors → single MarginEditor
 
 project:
   name: tiptap-rn-poc
-  description: A proof-of-concept rich text editor for React Native using TipTap
+  description: |
+    A proof-of-concept rich text editor for React Native using TipTap.
+    Features margin notes similar to LaTeX \marginpar functionality.
+    
+    ARCHITECTURE CHANGE: The margin notes panel now uses a SINGLE editor
+    instance (MarginEditor) containing all notes as MarginNoteBlock nodes,
+    instead of multiple NoteEditor instances (which had performance issues
+    due to each WebView consuming 30-50MB memory).
   repository:
     owner: illuminati360
     name: note
@@ -34,10 +41,17 @@ architecture:
       description: |
         Standalone web build of TipTap editor that gets bundled into a single HTML file.
         This HTML is then embedded in the React Native WebView.
+        
+        DUAL BUILD: Now builds two separate bundles:
+        - index.html / main.ts → Main document editor
+        - margin.html / marginEditor.ts → Margin notes editor
       key_files:
-        - src/main.ts  # TipTap editor initialization and message handling
+        - src/main.ts           # Main editor initialization and message handling
+        - src/marginEditor.ts   # Margin notes editor (NEW)
         - index.html
+        - margin.html           # (NEW)
         - vite.config.ts
+        - vite.margin.config.ts # (NEW) Margin editor build config
 
     tiptap_extensions:
       path: packages/tiptap-extensions/
@@ -49,6 +63,15 @@ architecture:
           description: |
             Inline anchor badges (numbered circles) that mark positions in the document.
             Each anchor links to a margin note displayed in a side panel.
+        - name: MarginNoteBlock
+          type: block node (NEW)
+          description: |
+            Block-level wrapper for each note in the margin editor.
+            Contains noteId and noteIndex attributes. Has custom NodeView
+            rendering a badge with the note number. Commands:
+            - insertMarginNoteBlock(noteId, noteIndex)
+            - deleteMarginNoteBlock(noteId)
+            - updateMarginNoteBlockIndex(noteId, newIndex)
         - name: NoteHighlight
           type: mark
           description: Highlight text associated with margin notes
@@ -72,12 +95,17 @@ architecture:
         - name: TipTapEditor.web.tsx
           platform: web
           description: Direct TipTap integration for web platform
-        - name: NoteEditor.tsx
+        - name: MarginEditor.tsx
           platform: native
-          description: Smaller editor for margin note content
-        - name: NoteEditor.web.tsx
+          description: |
+            (NEW) Single WebView-based editor for ALL margin notes.
+            Uses MarginNoteBlock extension. Replaced multiple NoteEditors.
+        - name: MarginEditor.web.tsx
           platform: web
-          description: Web version of margin note editor
+          description: |
+            (NEW) Direct TipTap integration for margin notes on web.
+            IMPORTANT: Does NOT clear focusedEditor on blur - this was
+            causing toolbar buttons to gray out when clicked.
         - name: AsyncMessages.ts
           description: |
             Manages request/response matching for async WebView communication.
@@ -85,19 +113,33 @@ architecture:
             when multiple concurrent operations are in flight.
         - name: EditorFocusContext.tsx
           description: |
-            React context for tracking which editor (main or which note) has focus.
+            React context for tracking which editor (main or margin) has focus.
             Important for applying formatting commands to the correct editor.
+            Values: 'main' | 'margin-editor' | null
         - name: editorHtml.ts
-          description: Contains the bundled HTML string for the WebView
+          description: Contains the bundled HTML string for main editor WebView
+        - name: marginEditorHtml.ts
+          description: (NEW) Contains bundled HTML for margin editor WebView
+      deleted_files:
+        - NoteEditor.tsx      # DELETED - replaced by MarginEditor
+        - NoteEditor.web.tsx  # DELETED - replaced by MarginEditor.web
 
     ui_components:
       path: src/components/
       files:
         - name: MarginNotesPanel.tsx
           description: |
-            Side panel displaying margin notes. Notes are positioned to align
-            with their anchor positions in the main editor. Handles dynamic
-            reordering when anchors are moved in the document.
+            (REWRITTEN) Side panel displaying margin notes. Now wraps a SINGLE
+            MarginEditor instance instead of multiple NoteEditors.
+            
+            Exposes methods via useImperativeHandle:
+            - getMarginEditorRef(): Access to MarginEditor for toolbar commands
+            - insertNoteBlock(noteId): Insert new note block
+            - deleteNoteBlock(noteId): Delete note block
+            - updateNoteIndices(notes): Update all note indices after reorder
+            
+            Notes are positioned to align with their anchor positions in the
+            main editor using absolute positioning.
         - name: ShapeIcons.tsx
           description: React Native SVG icons for shape toolbar buttons
 
@@ -107,17 +149,23 @@ architecture:
 
 features:
   margin_notes:
-    status: implemented
+    status: implemented (REFACTORED)
     description: |
       Academic-style margin notes system similar to LaTeX \marginpar.
       Users can insert numbered anchors in the document that link to
       notes displayed in a right-side panel.
+      
+      ARCHITECTURE: Uses a SINGLE MarginEditor containing all notes as
+      MarginNoteBlock nodes, instead of multiple NoteEditor WebViews.
+      This dramatically improves memory usage (one WebView vs many).
     behavior:
       - Anchors display as small numbered circles (1, 2, 3...)
       - Note indices are dynamically recalculated based on document position
       - Notes in the panel try to align vertically with their anchors
       - When anchors are reordered (cut/paste), indices update automatically
-      - Each note has its own mini TipTap editor for rich text content
+      - Single TipTap editor contains all notes as MarginNoteBlock nodes
+      - Each MarginNoteBlock has a badge showing note number
+      - Focus tracked as 'margin-editor' (single value, not per-note)
 
   webview_bridge:
     status: implemented
@@ -152,11 +200,15 @@ features:
       on the runtime platform.
 
   focus_management:
-    status: implemented
+    status: implemented (FIXED)
     description: |
-      EditorFocusContext tracks whether the main editor or a specific
-      note editor has focus. Toolbar commands are routed to the
-      currently focused editor.
+      EditorFocusContext tracks whether the main editor or margin editor
+      has focus. Toolbar commands are routed to the currently focused editor.
+      
+      CRITICAL FIX: Do NOT clear focusedEditor on blur. Clicking a toolbar
+      button causes the editor to blur momentarily - if we clear focus on
+      blur, the toolbar button grays out before the command executes.
+      Instead, only set focusedEditor when another editor gains focus.
 
 # ============================================================================
 # TECHNICAL DECISIONS & DISCUSSIONS
@@ -187,13 +239,33 @@ decisions:
       query anchor positions from the editor and sort by line number
       to calculate indices dynamically.
 
-  - topic: Multiple editors and focus
-    decision: EditorFocusContext pattern
+  - topic: Single vs Multiple editors for notes
+    decision: Single MarginEditor with MarginNoteBlock nodes (REFACTORED)
     rationale: |
-      The app has one main editor and multiple note editors.
-      When user presses Bold in toolbar, we need to know which
-      editor should receive the command. The context tracks
-      the focused editor ID.
+      Originally used multiple NoteEditor instances (one per note).
+      This had serious performance issues - each WebView consumes
+      30-50MB memory. With many notes, memory usage was prohibitive.
+      
+      Refactored to use a SINGLE MarginEditor containing all notes
+      as MarginNoteBlock nodes. This is more efficient and was the
+      original design intention.
+
+  - topic: Focus handling on blur
+    decision: Do NOT clear focusedEditor on blur (CRITICAL FIX)
+    rationale: |
+      When clicking a toolbar button, the editor temporarily loses
+      focus. If we call setFocusedEditor(null) on blur, the toolbar
+      thinks no editor is focused and disables the button before
+      the command executes. Instead, only update focusedEditor when
+      a specific editor gains focus.
+
+  - topic: LLM for language tutoring
+    decision: Gemini 2.5 Flash-Lite
+    rationale: |
+      For grammar feedback features, Gemini 2.5 Flash-Lite offers
+      good quality at low cost. User is learning German and wants
+      grammar correction with explanations. Alternatives considered:
+      GPT-4o-mini, Claude Haiku. Gemini chosen for cost efficiency.
 
   - topic: Shared extensions package
     decision: Monorepo with packages/tiptap-extensions
@@ -233,10 +305,14 @@ development:
   after_editor_changes:
     description: |
       If you modify anything in editor-web/ (including extensions),
-      you must rebuild the web bundle and update editorHtml.ts:
+      you must rebuild the web bundle and update the HTML exports:
     steps:
-      - cd editor-web && yarn build
-      - Copy the built HTML into src/editor/editorHtml.ts
+      - cd editor-web && npm run build
+      - node generateHtmlExport.js
+    notes: |
+      The build script now produces TWO bundles:
+      - dist/index.html → editorHtml.ts (main editor)
+      - dist-margin/margin.html → marginEditorHtml.ts (margin editor)
 
 # ============================================================================
 # KNOWN ISSUES & TODO
@@ -268,20 +344,24 @@ quick_reference:
   to_add_new_tiptap_extension:
     - Create extension in packages/tiptap-extensions/src/extensions/
     - Export from packages/tiptap-extensions/src/index.ts
-    - Import in editor-web/src/main.ts and add to extensions array
+    - Import in editor-web/src/main.ts (or marginEditor.ts) and add to extensions array
     - Rebuild: cd packages/tiptap-extensions && yarn build
-    - Rebuild: cd editor-web && yarn build
-    - Update editorHtml.ts with new bundle
+    - Rebuild: cd editor-web && npm run build && node generateHtmlExport.js
 
   to_add_new_toolbar_button:
     - Add button UI in App.tsx toolbar section
+    - Handle focus routing (main editor vs margin editor)
     - Add message type in TipTapEditor.tsx (sendMessage function)
     - Handle message in editor-web/src/main.ts (message listener)
     - Add command execution using editor.chain()
 
   to_modify_margin_notes_behavior:
     - Anchor rendering: packages/tiptap-extensions/src/extensions/MarginNote.ts
+    - Note block wrapper: packages/tiptap-extensions/src/extensions/MarginNoteBlock.ts
     - Panel UI: src/components/MarginNotesPanel.tsx
+    - Margin editor (web): src/editor/MarginEditor.web.tsx
+    - Margin editor (native): src/editor/MarginEditor.tsx
+    - Margin editor bundle: editor-web/src/marginEditor.ts
     - Position tracking: editor-web/src/main.ts (getAnchorPositions)
     - State management: App.tsx (marginNotes state, handleAnchorPositions)
 
@@ -303,3 +383,154 @@ dependencies:
     - vite-plugin-singlefile: ^2.3.0
     - tsup: ^8.0.0 (for extensions package)
     - typescript: ~5.9.2
+
+# ============================================================================
+# CHANGE HISTORY
+# ============================================================================
+
+change_history:
+  - session: "Single MarginEditor Refactor"
+    summary: |
+      Major architecture change from multiple NoteEditor instances to
+      single MarginEditor with MarginNoteBlock nodes.
+    
+    files_created:
+      - path: packages/tiptap-extensions/src/extensions/MarginNoteBlock.ts
+        description: |
+          Block-level node extension for wrapping individual notes.
+          Has noteId/noteIndex attributes, custom NodeView with badge.
+          Commands: insertMarginNoteBlock, deleteMarginNoteBlock, updateMarginNoteBlockIndex
+      
+      - path: src/editor/MarginEditor.tsx
+        description: Native (WebView) margin notes editor
+      
+      - path: src/editor/MarginEditor.web.tsx
+        description: |
+          Web platform margin notes editor. Uses direct TipTap.
+          Key implementation detail: does NOT call setFocusedEditor(null) on blur.
+      
+      - path: editor-web/src/marginEditor.ts
+        description: |
+          WebView bundle for mobile margin editor. Handles:
+          - insert-note-block: Inserts block, focuses it, sends note-block-focus
+          - delete-note-block: Removes block by noteId
+          - update-note-indices: Updates noteIndex attributes
+      
+      - path: editor-web/margin.html
+        description: HTML entry point for margin editor Vite build
+      
+      - path: editor-web/vite.margin.config.ts
+        description: Separate Vite config for margin editor build
+      
+      - path: src/editor/marginEditorHtml.ts
+        description: Generated file containing bundled margin editor HTML
+
+    files_modified:
+      - path: packages/tiptap-extensions/src/index.ts
+        change: Export MarginNoteBlock extension
+      
+      - path: editor-web/package.json
+        change: |
+          Added dual build scripts:
+          "build:main": "vite build"
+          "build:margin": "vite build --config vite.margin.config.ts"
+          "build": "npm run build:main && npm run build:margin"
+      
+      - path: editor-web/generateHtmlExport.js
+        change: Generate both editorHtml.ts and marginEditorHtml.ts
+      
+      - path: src/editor/TipTapEditor.tsx
+        change: Added onFocus/onBlur handlers for focus tracking
+      
+      - path: editor-web/src/main.ts
+        change: Added focus/blur event handlers for native bridge
+      
+      - path: src/editor/index.ts
+        change: Export MarginEditor, removed NoteEditor exports
+      
+      - path: src/components/MarginNotesPanel.tsx
+        change: |
+          Complete rewrite. Now wraps single MarginEditor instead of
+          multiple NoteEditors. Exposes getMarginEditorRef, insertNoteBlock,
+          deleteNoteBlock, updateNoteIndices via useImperativeHandle.
+      
+      - path: App.tsx
+        change: |
+          Updated toolbar handlers to route to margin editor:
+          notesPanelRef.current?.getMarginEditorRef()?.toggleBold()
+
+    files_deleted:
+      - path: src/editor/NoteEditor.tsx
+        reason: Replaced by MarginEditor.tsx
+      
+      - path: src/editor/NoteEditor.web.tsx
+        reason: Replaced by MarginEditor.web.tsx
+
+    bugs_fixed:
+      - issue: Mobile editor not getting focus
+        cause: Missing onFocus/onBlur handlers in native bridge
+        fix: Added handlers in TipTapEditor.tsx and main.ts
+      
+      - issue: Toolbar actions not applying to margin notes
+        cause: focusedEditor not being set after note insertion
+        fix: |
+          In MarginEditor.web.tsx: Call setFocusedEditor('margin-editor')
+          after inserting and focusing a note block.
+          In marginEditor.ts: Send note-block-focus message after insertion.
+      
+      - issue: Toolbar buttons graying out when clicked
+        cause: setFocusedEditor(null) called on blur
+        fix: |
+          Removed setFocusedEditor(null) from onBlur handler.
+          Clicking toolbar causes momentary blur - if we clear focus,
+          toolbar disables before command executes.
+
+# ============================================================================
+# CONVERSATION CONTEXT FOR LLM HANDOFF
+# ============================================================================
+
+conversation_context:
+  summary: |
+    User has a TipTap-based React Native rich text editor with margin notes.
+    The margin notes feature was refactored from multiple NoteEditor WebViews
+    (one per note, ~50MB each) to a single MarginEditor with MarginNoteBlock
+    nodes (one WebView for all notes).
+    
+    Several bugs were fixed related to focus management:
+    1. Mobile editor not getting focus - needed bridge handlers
+    2. Toolbar not affecting margin notes - needed focusedEditor state
+    3. Toolbar buttons disabling on click - don't clear focus on blur
+    
+    User is planning to add a language tutoring feature using Gemini 2.5
+    Flash-Lite for German grammar correction and feedback.
+
+  key_patterns:
+    - pattern: Platform-specific components
+      description: |
+        Use .web.tsx suffix for web platform, .tsx for native.
+        Export via Platform.select() in index.ts files.
+    
+    - pattern: Focus management
+      description: |
+        EditorFocusContext tracks 'main' | 'margin-editor' | null.
+        NEVER clear on blur - only set when another editor gains focus.
+    
+    - pattern: WebView bridge
+      description: |
+        Native components use WebView with postMessage/onMessage.
+        AsyncMessages class handles request/response correlation.
+    
+    - pattern: Dual builds
+      description: |
+        editor-web builds two bundles: main (index.html) and margin (margin.html).
+        Both exported to TypeScript string files via generateHtmlExport.js.
+
+  next_steps:
+    - Integrate Gemini 2.5 Flash-Lite for grammar feedback
+    - Consider persisting notes to storage
+    - May need to handle keyboard behavior on mobile
+    
+  user_context:
+    - Learning German, wants grammar tutoring features
+    - Familiar with TipTap/ProseMirror concepts
+    - Uses macOS, zsh shell

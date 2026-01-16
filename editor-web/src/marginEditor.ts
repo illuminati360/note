@@ -15,7 +15,7 @@ declare global {
 
 // Message types for communication with React Native
 type MessageToRN = {
-  type: 'content-change' | 'content-response' | 'editor-ready' | 'selection-change' | 'editor-focus' | 'editor-blur' | 'note-block-focus';
+  type: 'content-change' | 'content-response' | 'editor-ready' | 'selection-change' | 'editor-focus' | 'editor-blur' | 'note-block-focus' | 'delete-margin-note';
   payload: any;
 };
 
@@ -31,6 +31,17 @@ type MessageFromRN = {
 function sendToRN(message: MessageToRN) {
   if (window.ReactNativeWebView) {
     window.ReactNativeWebView.postMessage(JSON.stringify(message));
+  }
+}
+
+// Debug log that sends to React Native
+function debugLog(tag: string, ...args: any[]) {
+  console.log(tag, ...args);
+  if (window.ReactNativeWebView) {
+    window.ReactNativeWebView.postMessage(JSON.stringify({
+      type: 'debug-log',
+      payload: { tag, message: args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ') },
+    }));
   }
 }
 
@@ -51,7 +62,15 @@ function initEditor() {
       Square,
       Circle,
       Flower,
-      MarginNoteBlock,
+      MarginNoteBlock.configure({
+        onDeleteNote: (noteId: string) => {
+          // Send message to React Native to delete the anchor in main editor
+          sendToRN({
+            type: 'delete-margin-note',
+            payload: { noteId },
+          });
+        },
+      }),
     ],
     content: initialContent,
     onUpdate: ({ editor }) => {
@@ -77,6 +96,13 @@ function initEditor() {
         },
       });
 
+      // Only detect note block focus if the editor actually has focus
+      // This prevents sending note-block-focus when note blocks are inserted/deleted
+      // while the main editor has focus
+      if (!editor.isFocused) {
+        return;
+      }
+
       // Detect which note block has the cursor
       const { $from } = editor.state.selection;
       let currentNoteId: string | null = null;
@@ -97,13 +123,35 @@ function initEditor() {
         });
       }
     },
-    onFocus: () => {
+    onFocus: ({ editor }) => {
+      debugLog('[MarginEditor]', 'onFocus triggered');
       sendToRN({
         type: 'editor-focus',
         payload: {},
       });
+      
+      // Also detect and send the current note block when editor gains focus
+      const { $from } = editor.state.selection;
+      let currentNoteId: string | null = null;
+      
+      for (let d = $from.depth; d > 0; d--) {
+        const node = $from.node(d);
+        if (node.type.name === 'marginNoteBlock') {
+          currentNoteId = node.attrs.noteId;
+          break;
+        }
+      }
+      
+      if (currentNoteId) {
+        lastFocusedNoteId = currentNoteId;
+        sendToRN({
+          type: 'note-block-focus',
+          payload: { noteId: currentNoteId },
+        });
+      }
     },
     onBlur: () => {
+      debugLog('[MarginEditor]', 'onBlur triggered');
       sendToRN({
         type: 'editor-blur',
         payload: {},
@@ -182,34 +230,21 @@ function initEditor() {
         editor.chain().focus().insertFlower(data.payload || {}).run();
         break;
       case 'insert-note-block': {
+        debugLog('[MarginEditor]', 'insert-note-block received:', data.payload);
         const { noteId, noteIndex } = data.payload;
         editor.chain().insertMarginNoteBlock(noteId, noteIndex).run();
-        
-        // After insertion, find and focus the new note block
-        const { doc } = editor.state;
-        let targetPos: number | null = null;
-
-        doc.descendants((node, pos) => {
-          if (node.type.name === 'marginNoteBlock' && node.attrs.noteId === noteId) {
-            targetPos = pos + 2; // +1 for block, +1 for paragraph
-            return false;
-          }
-          return true;
-        });
-
-        if (targetPos !== null) {
-          editor.chain().focus().setTextSelection(targetPos).run();
-          // Send focus event to React Native
-          lastFocusedNoteId = noteId;
-          sendToRN({
-            type: 'note-block-focus',
-            payload: { noteId },
-          });
-        }
+        debugLog('[MarginEditor]', 'insert-note-block done, NOT focusing');
+        // Don't auto-focus the new note block - let the user decide where to focus
+        // This prevents stealing focus from the main editor
         break;
       }
       case 'delete-note-block':
+        debugLog('[MarginEditor]', 'delete-note-block received:', data.payload);
         editor.commands.deleteMarginNoteBlock(data.payload.noteId);
+        // After deletion, blur the editor to prevent focus issues
+        // The user can click to focus whatever editor they want
+        editor.commands.blur();
+        debugLog('[MarginEditor]', 'delete-note-block done, blurred');
         break;
       case 'update-note-block-index':
         editor.commands.updateMarginNoteBlockIndex(data.payload.noteId, data.payload.noteIndex);

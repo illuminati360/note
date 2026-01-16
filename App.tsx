@@ -2,17 +2,9 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useRef, useState, useCallback, useEffect } from 'react';
-import { TipTapEditor, TipTapEditorRef, EditorState, EditorContent, AnchorPosition, EditorFocusProvider, useEditorFocus } from './src/editor';
+import { TipTapEditor, TipTapEditorRef, EditorState, EditorContent, MarginNoteData, EditorFocusProvider, useEditorFocus } from './src/editor';
 import { SquareIcon, CircleIcon, FlowerIcon } from './src/components/ShapeIcons';
 import { MarginNotesPanel, MarginNotesPanelRef } from './src/components/MarginNotesPanel';
-
-// Margin note data structure (for tracking anchors in main editor)
-interface MarginNoteData {
-	id: string;
-	noteIndex: number;
-	line: number;
-	blockIndex: number;
-}
 
 // Generate unique ID
 function generateId(): string {
@@ -40,7 +32,6 @@ function AppContent() {
 	const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
 
 	const handleContentChange = useCallback((content: EditorContent) => {
-		console.log('Content changed:', content.html);
 	}, []);
 
 	const handleSelectionChange = useCallback((state: EditorState) => {
@@ -48,7 +39,6 @@ function AppContent() {
 	}, []);
 
 	const handleReady = useCallback(() => {
-		console.log('Editor is ready!');
 	}, []);
 
 	// Track when main editor is focused
@@ -56,78 +46,86 @@ function AppContent() {
 		setFocusedEditor('main');
 	}, [setFocusedEditor]);
 
-	const handleSave = useCallback(async () => {
-		const content = await editorRef.current?.getContent();
-		if (content) {
-			console.log('=== Save Button Pressed ===');
-			console.log('HTML:', content.html);
-			console.log('Margin Notes:', marginNotes);
-		}
-	}, [marginNotes]);
-
-	// Insert a new margin note - noteIndex will be calculated dynamically
+	// Insert a new margin note
+	// Only insert anchor in main editor - the sync will be handled by syncMarginNotes
 	const handleInsertMarginNote = useCallback(() => {
 		const id = generateId();
 		const noteIndex = marginNotes.length + 1;
 		
-		// Insert anchor in main editor
+		// Only insert anchor in main editor
+		// The margin note block will be created by syncMarginNotes when it detects the new anchor
 		editorRef.current?.insertMarginNote(id, noteIndex);
-		
-		// Insert note block in margin editor
-		notesPanelRef.current?.insertNoteBlock(id, noteIndex);
-		
-		// Track the note data
-		setMarginNotes(prev => [...prev, {
-			id,
-			noteIndex,
-			line: 0,
-			blockIndex: 0,
-		}]);
 		
 		setSelectedNoteId(id);
 	}, [marginNotes.length]);
 
+	// Track previous notes to detect changes
+	const prevNotesRef = useRef<MarginNoteData[]>([]);
+
 	// Handle anchor positions update from editor - this gives us the document order
-	const handleAnchorPositions = useCallback((positions: AnchorPosition[]) => {
-		setMarginNotes(prev => {
-			const sortedPositions = [...positions].sort((a, b) => a.line - b.line);
-			
-			const updatedNotes = prev.map(note => {
-				const pos = positions.find(p => p.id === note.id);
-				if (pos) {
-					const dynamicIndex = sortedPositions.findIndex(p => p.id === note.id) + 1;
-					return {
-						...note,
-						noteIndex: dynamicIndex,
-						line: pos.line,
-						blockIndex: pos.blockIndex,
-					};
-				}
-				return note;
-			});
+	// This is the SINGLE SOURCE OF TRUTH for syncing anchors with margin notes
+	const syncMarginNotes = useCallback((positions: MarginNoteData[]) => {
+		// Sort positions by document order (line number)
+		const sortedPositions = [...positions].sort((a, b) => a.line - b.line);
+		
+		// Build new notes array based on anchor order
+		const updatedNotes: MarginNoteData[] = sortedPositions.map((pos, index) => ({
+			id: pos.id,
+			noteIndex: index + 1,
+			line: pos.line,
+			blockIndex: pos.blockIndex,
+		}));
 
-			// Update the margin editor with new indices
-			notesPanelRef.current?.updateNoteIndices(updatedNotes);
-
-			return updatedNotes;
-		});
+		setMarginNotes(updatedNotes);
 	}, []);
 
-	// Handle margin note deleted from editor (anchor was deleted)
-	const handleMarginNoteDeleted = useCallback((id: string) => {
-		// Delete from margin editor
-		notesPanelRef.current?.deleteNoteBlock(id);
+	// Sync MarginEditor with marginNotes state changes
+	useEffect(() => {
+		const prev = prevNotesRef.current;
+		const current = marginNotes;
 		
-		// Update state
-		setMarginNotes(prev => prev.filter(note => note.id !== id));
+		const prevIds = new Set(prev.map(n => n.id));
+		const currentIds = new Set(current.map(n => n.id));
+		
+		// Delete removed notes first
+		prev.forEach(note => {
+			if (!currentIds.has(note.id)) {
+				notesPanelRef.current?.deleteNoteBlock(note.id);
+			}
+		});
+		
+		// Insert new notes
+		current.forEach(note => {
+			if (!prevIds.has(note.id)) {
+				notesPanelRef.current?.insertNoteBlock(note.id, note.noteIndex);
+			}
+		});
+		
+		// Update all note block indices
+		notesPanelRef.current?.updateNoteIndices(current);
+		
+		prevNotesRef.current = current;
+	}, [marginNotes]);
+
+	// Handle margin note deleted from editor (anchor was deleted)
+	// Note: This is now handled in syncMarginNotes, but we keep this
+	// for immediate feedback when user explicitly deletes an anchor
+	const handleMarginNoteDeleted = useCallback((id: string) => {
+		// The actual deletion will be handled by syncMarginNotes
+		// when it receives the updated positions
 		if (selectedNoteId === id) {
 			setSelectedNoteId(null);
 		}
 	}, [selectedNoteId]);
 
+	// Handle note deleted from margin panel (badge click on empty note)
+	// This needs to delete the anchor in the main editor
+	const handleDeleteNoteFromPanel = useCallback((noteId: string) => {
+		editorRef.current?.deleteMarginNote(noteId);
+	}, []);
+
 	// Handle content change from margin editor
 	const handleMarginContentChange = useCallback((content: string) => {
-		console.log('Margin notes content:', content);
 	}, []);
 
 	// Handle note block focus in margin editor
@@ -137,12 +135,10 @@ function AppContent() {
 
 	// Toolbar action handlers - route to focused editor
 	const handleToggleBold = useCallback(() => {
-		console.log('handleToggleBold - isMainEditorFocused:', isMainEditorFocused, 'focusedNoteId:', focusedNoteId, 'focusedEditor:', focusedEditor);
 		if (isMainEditorFocused) {
 			editorRef.current?.toggleBold();
 		} else if (focusedNoteId) {
 			const marginEditor = notesPanelRef.current?.getMarginEditorRef();
-			console.log('marginEditor ref:', !!marginEditor);
 			marginEditor?.toggleBold();
 		}
 	}, [isMainEditorFocused, focusedNoteId, focusedEditor]);
@@ -226,7 +222,6 @@ function AppContent() {
 
 				<View style={styles.separator} />
 
-				<Text style={styles.sectionLabel}>Shapes:</Text>
 				<TouchableOpacity
 					style={[styles.shapeButton, !hasEditorFocus && styles.toolbarButtonDisabled]}
 					onPress={handleInsertSquare}
@@ -258,24 +253,18 @@ function AppContent() {
 				>
 					<Text style={[styles.noteButtonText, !isMainEditorFocused && { opacity: 0.4 }]}>📝</Text>
 				</TouchableOpacity>
-
-				<View style={{ flex: 1 }} />
-
-				<TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-					<Text style={styles.saveButtonText}>Save</Text>
-				</TouchableOpacity>
 			</View>
 
 			{/* Editor Container */}
 			<View style={styles.editorContainer}>
 				<TipTapEditor
 					ref={editorRef}
-					initialContent="<p>Hello from <strong>TipTap</strong> in React Native!</p>"
+					initialContent=""
 					onContentChange={handleContentChange}
 					onSelectionChange={handleSelectionChange}
 					onReady={handleReady}
 					onFocus={handleEditorFocus}
-					onAnchorPositions={handleAnchorPositions}
+					onAnchorPositions={syncMarginNotes}
 					onMarginNoteDeleted={handleMarginNoteDeleted}
 					style={styles.editor}
 				/>
@@ -286,6 +275,7 @@ function AppContent() {
 						notes={marginNotes}
 						onContentChange={handleMarginContentChange}
 						onNoteBlockFocus={handleNoteBlockFocus}
+						onDeleteNote={handleDeleteNoteFromPanel}
 					/>
 				</View>
 			</View>

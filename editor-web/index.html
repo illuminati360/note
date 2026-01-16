@@ -17,14 +17,17 @@
     }
     
     #editor {
-      padding: 16px;
       height: 100%;
-      outline: none;
+      display: flex;
+      flex-direction: column;
+      cursor: text;
     }
     
     .ProseMirror {
       outline: none;
-      height: 100%;
+      flex: 1;
+      padding: 16px;
+      min-height: 100%;
     }
     
     .ProseMirror p {
@@ -33,6 +36,15 @@
     
     .ProseMirror:focus {
       outline: none;
+    }
+    
+    /* Placeholder for empty editor */
+    .ProseMirror p.is-editor-empty:first-child::before {
+      color: #adb5bd;
+      content: attr(data-placeholder);
+      float: left;
+      height: 0;
+      pointer-events: none;
     }
   </style>
 </head>

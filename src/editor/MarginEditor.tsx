@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useState, useEffect } from 'react';
+import { useRef, useCallback, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { StyleSheet, View, ViewStyle, Text } from 'react-native';
 import { marginEditorHtml } from './marginEditorHtml';
@@ -38,15 +38,19 @@ export interface MarginEditorProps {
   onFocus?: () => void;
   onBlur?: () => void;
   onNoteBlockFocus?: (noteId: string | null) => void;
+  onDeleteNote?: (noteId: string) => void;
   style?: ViewStyle;
 }
 
-export const MarginEditor = React.forwardRef<MarginEditorRef, MarginEditorProps>(
-  ({ initialContent, onContentChange, onSelectionChange, onFocus, onBlur, onNoteBlockFocus, style }, ref) => {
+export const MarginEditor = forwardRef<MarginEditorRef, MarginEditorProps>(
+  ({ initialContent, onContentChange, onSelectionChange, onFocus, onBlur, onNoteBlockFocus, onDeleteNote, style }, ref) => {
     const webViewRef = useRef<WebView>(null);
     const [isReady, setIsReady] = useState(false);
     const [isEmpty, setIsEmpty] = useState(true);
-    const { setFocusedEditor } = useEditorFocus();
+    const { focusedEditor, setFocusedEditor } = useEditorFocus();
+    
+    // Track if this editor has focus (at the TipTap level)
+    const hasFocusRef = useRef(false);
 
     // Send message to the WebView
     const sendMessage = useCallback((type: string, payload?: any) => {
@@ -86,26 +90,40 @@ export const MarginEditor = React.forwardRef<MarginEditorRef, MarginEditorProps>
             onSelectionChange?.(data.payload);
             break;
           case 'editor-focus':
+            hasFocusRef.current = true;
             onFocus?.();
             break;
           case 'editor-blur':
+            hasFocusRef.current = false;
             onBlur?.();
             break;
           case 'note-block-focus':
             const noteId = data.payload?.noteId || null;
             onNoteBlockFocus?.(noteId);
+            // When a note block is focused, update the global focus state
+            // This will override the main editor's focus state
             if (noteId) {
+              hasFocusRef.current = true;
               setFocusedEditor(noteId);
             }
+            break;
+          case 'delete-margin-note':
+            // User clicked badge to delete an empty note - notify parent to delete anchor in main editor
+            if (data.payload?.noteId) {
+              onDeleteNote?.(data.payload.noteId);
+            }
+            break;
+          case 'debug-log':
+            console.log(`[WebView] ${data.payload?.tag}`, data.payload?.message);
             break;
         }
       } catch (error) {
         console.warn('Failed to parse message from margin editor:', error);
       }
-    }, [onContentChange, onSelectionChange, onFocus, onBlur, onNoteBlockFocus, setFocusedEditor]);
+    }, [onContentChange, onSelectionChange, onFocus, onBlur, onNoteBlockFocus, onDeleteNote, setFocusedEditor]);
 
     // Expose methods via ref
-    React.useImperativeHandle(ref, () => ({
+    useImperativeHandle(ref, () => ({
       getContent: () => {
         return asyncMessages.sendAsyncMessage<EditorContent>(
           'get-content',
@@ -150,12 +168,13 @@ export const MarginEditor = React.forwardRef<MarginEditorRef, MarginEditorProps>
     return (
       <View style={[styles.container, style]}>
         {isEmpty && (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No notes</Text>
-            <Text style={styles.emptyHint}>Click 📝 to add a note</Text>
+          <View style={[styles.emptyState, { pointerEvents: 'none' }]}>
+            <Text style={styles.emptyText}>Margin Notes</Text>
           </View>
         )}
-        <View style={[styles.webViewContainer, isEmpty && styles.hidden]}>
+        <View 
+          style={[styles.webViewContainer, isEmpty && styles.hidden, { pointerEvents: isEmpty ? 'none' : 'auto' }]}
+        >
           <WebView
             ref={webViewRef}
             source={{ html: marginEditorHtml }}

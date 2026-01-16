@@ -1,4 +1,5 @@
 import { Node, mergeAttributes } from '@tiptap/core';
+import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state';
 
 export interface MarginNoteBlockAttributes {
   noteId: string;
@@ -7,6 +8,7 @@ export interface MarginNoteBlockAttributes {
 
 export interface MarginNoteBlockOptions {
   HTMLAttributes: Record<string, any>;
+  onDeleteNote?: (noteId: string) => void;
 }
 
 declare module '@tiptap/core' {
@@ -24,6 +26,10 @@ declare module '@tiptap/core' {
        * Update the noteIndex of a margin note block
        */
       updateMarginNoteBlockIndex: (noteId: string, noteIndex: number) => ReturnType;
+      /**
+       * Select all content within the current margin note block
+       */
+      selectAllInNoteBlock: () => ReturnType;
     };
   }
 }
@@ -42,6 +48,7 @@ export const MarginNoteBlock = Node.create<MarginNoteBlockOptions>({
   addOptions() {
     return {
       HTMLAttributes: {},
+      onDeleteNote: undefined,
     };
   },
 
@@ -88,11 +95,25 @@ export const MarginNoteBlock = Node.create<MarginNoteBlockOptions>({
       insertMarginNoteBlock:
         (noteId: string, noteIndex: number) =>
         ({ commands, state }) => {
-          // Insert at the end of the document
           const { doc } = state;
-          const endPos = doc.content.size;
           
-          return commands.insertContentAt(endPos, {
+          // Find the correct position to insert based on noteIndex
+          // We want to insert BEFORE the first block with noteIndex > our noteIndex
+          let insertPos = doc.content.size; // Default to end
+          
+          doc.descendants((node, pos) => {
+            if (node.type.name === this.name) {
+              const existingIndex = node.attrs.noteIndex as number;
+              if (existingIndex >= noteIndex) {
+                // Insert before this node
+                insertPos = pos;
+                return false; // Stop searching
+              }
+            }
+            return true;
+          });
+          
+          return commands.insertContentAt(insertPos, {
             type: this.name,
             attrs: { noteId, noteIndex },
             content: [
@@ -155,11 +176,79 @@ export const MarginNoteBlock = Node.create<MarginNoteBlockOptions>({
 
           return found;
         },
+
+      selectAllInNoteBlock:
+        () =>
+        ({ tr, state, dispatch }) => {
+          const { selection, doc } = state;
+          const { $from } = selection;
+          
+          // Find the marginNoteBlock that contains the cursor
+          for (let depth = $from.depth; depth > 0; depth--) {
+            const node = $from.node(depth);
+            if (node.type.name === this.name) {
+              // Found the note block - get the position of this block
+              const blockStart = $from.before(depth);
+              const blockEnd = $from.after(depth);
+              
+              // We need to find positions inside text-containing nodes
+              // Find the first and last valid text positions within the block
+              let firstTextPos: number | null = null;
+              let lastTextPos: number | null = null;
+              
+              doc.nodesBetween(blockStart, blockEnd, (child, pos) => {
+                // Skip the marginNoteBlock itself
+                if (child.type.name === this.name) {
+                  return true; // Continue into children
+                }
+                
+                // Find nodes that can contain text (inline content)
+                if (child.isTextblock) {
+                  const start = pos + 1; // Inside the textblock
+                  const end = pos + child.nodeSize - 1;
+                  
+                  if (firstTextPos === null) {
+                    firstTextPos = start;
+                  }
+                  lastTextPos = end;
+                }
+                return true;
+              });
+              
+              if (firstTextPos !== null && lastTextPos !== null && dispatch) {
+                const newSelection = TextSelection.create(doc, firstTextPos, lastTextPos);
+                tr.setSelection(newSelection);
+                dispatch(tr);
+              }
+              return true;
+            }
+          }
+          return false;
+        },
+    };
+  },
+
+  addKeyboardShortcuts() {
+    return {
+      'Mod-a': () => {
+        // If we're inside a note block, select only its content
+        const { state } = this.editor;
+        const { $from } = state.selection;
+        
+        for (let depth = $from.depth; depth > 0; depth--) {
+          const node = $from.node(depth);
+          if (node.type.name === this.name) {
+            return this.editor.commands.selectAllInNoteBlock();
+          }
+        }
+        // Not in a note block, let default behavior happen
+        return false;
+      },
     };
   },
 
   addNodeView() {
-    return ({ node, HTMLAttributes }) => {
+    return ({ node, HTMLAttributes, getPos, editor }) => {
       const dom = document.createElement('div');
       dom.classList.add('margin-note-block');
       dom.setAttribute('data-margin-note-block', '');
@@ -190,6 +279,43 @@ export const MarginNoteBlock = Node.create<MarginNoteBlockOptions>({
         user-select: none;
         cursor: pointer;
       `.replace(/\s+/g, ' ').trim();
+
+      // Add click handler to badge for deleting empty notes
+      badge.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const pos = getPos();
+        if (pos === undefined) return;
+        
+        // Get the current node from the document
+        const currentNode = editor.state.doc.nodeAt(pos);
+        if (!currentNode) return;
+        
+        // Check if the note is empty (only contains empty paragraph(s))
+        let isEmpty = true;
+        currentNode.content.forEach((child) => {
+          if (child.type.name === 'paragraph') {
+            if (child.textContent.trim() !== '') {
+              isEmpty = false;
+            }
+          } else {
+            // Has non-paragraph content
+            isEmpty = false;
+          }
+        });
+        
+        if (isEmpty) {
+          const noteId = currentNode.attrs.noteId;
+          // Delete the note block
+          editor.commands.deleteMarginNoteBlock(noteId);
+          // Call the onDeleteNote callback if provided
+          const onDeleteNote = this.options.onDeleteNote;
+          if (onDeleteNote) {
+            onDeleteNote(noteId);
+          }
+        }
+      });
 
       // Create content wrapper
       const contentDOM = document.createElement('div');

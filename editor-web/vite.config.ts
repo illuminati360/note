@@ -6,6 +6,11 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     target: 'es2015',
+    minify: 'esbuild',
+  },
+  esbuild: {
+    // Keep console.log for debugging
+    drop: [],
   },
   plugins: [viteSingleFile()],
 });

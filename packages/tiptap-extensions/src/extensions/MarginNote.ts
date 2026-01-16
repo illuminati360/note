@@ -171,6 +171,8 @@ export const MarginNote = Node.create<MarginNoteOptions>({
       deleteMarginNote:
         (id: string) =>
         ({ tr, state, dispatch, commands }) => {
+          let hasChanges = false;
+          
           // First, remove the associated highlight
           const markType = state.schema.marks['noteHighlight'];
           if (markType) {
@@ -184,26 +186,26 @@ export const MarginNote = Node.create<MarginNoteOptions>({
               if (marks.length > 0) {
                 marks.forEach(mark => {
                   tr.removeMark(pos, pos + node.nodeSize, mark);
+                  hasChanges = true;
                 });
               }
             });
           }
 
-          // Then, delete the anchor node
-          let deleted = false;
+          // Then, delete the anchor node (if it still exists)
           state.doc.descendants((node, pos) => {
             if (node.type.name === this.name && node.attrs.id === id) {
               if (dispatch) {
                 tr.delete(pos, pos + node.nodeSize);
-                deleted = true;
+                hasChanges = true;
               }
             }
           });
           
-          if (dispatch) {
+          if (dispatch && hasChanges) {
             dispatch(tr);
           }
-          return deleted;
+          return hasChanges;
         },
     };
   },

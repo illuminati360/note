@@ -1,12 +1,16 @@
-import React, { useRef, useCallback, useState, useEffect } from 'react';
+import { useRef, useCallback, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 import { editorHtml } from './editorHtml';
 import { asyncMessages } from './AsyncMessages';
 import type { SquareAttributes, CircleAttributes, FlowerAttributes, MarginNoteAttributes } from '@prose/tiptap-extensions';
+import type { MarginNoteData } from '../components/MarginNotesPanel';
 
 // Re-export shape attributes for consumers
 export type { SquareAttributes, CircleAttributes, FlowerAttributes, MarginNoteAttributes } from '@prose/tiptap-extensions';
+
+// Re-export MarginNoteData for consumers
+export type { MarginNoteData } from '../components/MarginNotesPanel';
 
 // Types for editor state
 export interface EditorState {
@@ -25,14 +29,6 @@ export interface EditorContent {
   json: any;
 }
 
-// Types for anchor positions (line-based)
-export interface AnchorPosition {
-  id: string;
-  noteIndex: number;
-  line: number;
-  blockIndex: number;
-}
-
 // Props for the TipTap editor component
 export interface TipTapEditorProps {
   initialContent?: string;
@@ -41,7 +37,7 @@ export interface TipTapEditorProps {
   onReady?: () => void;
   onFocus?: () => void;
   onBlur?: () => void;
-  onAnchorPositions?: (positions: AnchorPosition[]) => void;
+  onAnchorPositions?: (positions: MarginNoteData[]) => void;
   onMarginNoteDeleted?: (id: string) => void;
   style?: ViewStyle;
 }
@@ -62,7 +58,7 @@ export interface TipTapEditorRef {
   getAnchorPositions: () => void;
 }
 
-export const TipTapEditor = React.forwardRef<TipTapEditorRef, TipTapEditorProps>(
+export const TipTapEditor = forwardRef<TipTapEditorRef, TipTapEditorProps>(
   ({ initialContent, onContentChange, onSelectionChange, onReady, onFocus, onBlur, onAnchorPositions, onMarginNoteDeleted, style }, ref) => {
     const webViewRef = useRef<WebView>(null);
     const [isReady, setIsReady] = useState(false);
@@ -112,6 +108,7 @@ export const TipTapEditor = React.forwardRef<TipTapEditorRef, TipTapEditorProps>
             break;
           case 'editor-focus':
             onFocus?.();
+            console.log("main editor focus event received")
             break;
           case 'editor-blur':
             onBlur?.();
@@ -123,7 +120,7 @@ export const TipTapEditor = React.forwardRef<TipTapEditorRef, TipTapEditorProps>
     }, [onContentChange, onSelectionChange, onReady, onFocus, onBlur, onAnchorPositions, onMarginNoteDeleted]);
 
     // Expose methods via ref
-    React.useImperativeHandle(ref, () => ({
+    useImperativeHandle(ref, () => ({
       setContent: (content: string) => sendMessage('set-content', content),
       getContent: () => {
         return asyncMessages.sendAsyncMessage<EditorContent>(

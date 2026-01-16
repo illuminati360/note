@@ -27,11 +27,12 @@ interface MarginNotesPanelProps {
   notes: MarginNoteData[];
   onContentChange?: (content: string) => void;
   onNoteBlockFocus?: (noteId: string | null) => void;
+  onDeleteNote?: (noteId: string) => void;
   style?: ViewStyle;
 }
 
 export const MarginNotesPanel = forwardRef<MarginNotesPanelRef, MarginNotesPanelProps>(
-  function MarginNotesPanel({ notes, onContentChange, onNoteBlockFocus, style }, ref) {
+  function MarginNotesPanel({ notes, onContentChange, onNoteBlockFocus, onDeleteNote, style }, ref) {
     const marginEditorRef = useRef<MarginEditorRef>(null);
     const { focusedNoteId } = useEditorFocus();
 
@@ -53,6 +54,10 @@ export const MarginNotesPanel = forwardRef<MarginNotesPanelRef, MarginNotesPanel
     const handleNoteBlockFocus = useCallback((noteId: string | null) => {
       onNoteBlockFocus?.(noteId);
     }, [onNoteBlockFocus]);
+
+    const handleDeleteNote = useCallback((noteId: string) => {
+      onDeleteNote?.(noteId);
+    }, [onDeleteNote]);
 
     // Expose methods via ref
     useImperativeHandle(ref, () => ({
@@ -84,6 +89,7 @@ export const MarginNotesPanel = forwardRef<MarginNotesPanelRef, MarginNotesPanel
           ref={marginEditorRef}
           onContentChange={handleContentChange}
           onNoteBlockFocus={handleNoteBlockFocus}
+          onDeleteNote={handleDeleteNote}
         />
       </View>
     );

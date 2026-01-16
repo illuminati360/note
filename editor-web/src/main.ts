@@ -33,7 +33,7 @@ function sendToRN(message: MessageToRN) {
 
 // Initialize the TipTap editor
 function initEditor() {
-  const initialContent = window.initialContent || '<p>Start typing...</p>';
+  const initialContent = window.initialContent || '';
   
   const editor = new Editor({
     element: document.getElementById('editor')!,
@@ -63,12 +63,14 @@ function initEditor() {
       });
     },
     onFocus: () => {
+      console.log('[MainEditor] onFocus triggered');
       sendToRN({
         type: 'editor-focus',
         payload: {},
       });
     },
     onBlur: () => {
+      console.log('[MainEditor] onBlur triggered');
       sendToRN({
         type: 'editor-blur',
         payload: {},
@@ -149,6 +151,10 @@ function initEditor() {
     const currentIds = new Set(positions.map(p => p.id).filter(Boolean) as string[]);
     previousAnchorIds.forEach(id => {
       if (!currentIds.has(id)) {
+        // Clean up the highlight associated with this deleted anchor
+        // (the anchor is already deleted, but the highlight may remain)
+        editor.commands.deleteMarginNote(id);
+        
         sendToRN({
           type: 'margin-note-deleted',
           payload: { id },
@@ -212,13 +218,11 @@ function initEditor() {
         break;
       case 'insert-margin-note':
         editor.chain().focus().insertMarginNote(data.payload.id, data.payload.noteIndex).run();
-        // Send updated positions after insertion
-        setTimeout(sendAnchorPositions, 0);
+        // Anchor positions will be sent via the 'update' event handler
         break;
       case 'delete-margin-note':
         editor.chain().focus().deleteMarginNote(data.payload.id).run();
-        // Send updated positions after deletion
-        setTimeout(sendAnchorPositions, 0);
+        // Anchor positions will be sent via the 'update' event handler
         break;
       case 'get-anchor-positions':
         sendAnchorPositions();

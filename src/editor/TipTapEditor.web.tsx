@@ -1,9 +1,10 @@
-import React, { useImperativeHandle, forwardRef } from 'react';
+import { useImperativeHandle, forwardRef, useRef, useCallback, CSSProperties } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { StyleSheet, View, ViewStyle } from 'react-native';
+import { ViewStyle } from 'react-native';
 import { Square, Circle, Flower, MarginNote, NoteHighlight } from '@prose/tiptap-extensions';
-import type { TipTapEditorRef, EditorState, EditorContent as EditorContentType, AnchorPosition, SquareAttributes, CircleAttributes, FlowerAttributes } from './TipTapEditor';
+import type { TipTapEditorRef, EditorState, EditorContent as EditorContentType, MarginNoteData, SquareAttributes, CircleAttributes, FlowerAttributes } from './TipTapEditor';
+import styles from './TipTapEditor.module.css';
 
 export interface TipTapEditorWebProps {
   initialContent?: string;
@@ -12,7 +13,7 @@ export interface TipTapEditorWebProps {
   onReady?: () => void;
   onFocus?: () => void;
   onBlur?: () => void;
-  onAnchorPositions?: (positions: AnchorPosition[]) => void;
+  onAnchorPositions?: (positions: MarginNoteData[]) => void;
   onMarginNoteDeleted?: (id: string) => void;
   style?: ViewStyle;
 }
@@ -20,13 +21,13 @@ export interface TipTapEditorWebProps {
 export const TipTapEditorWeb = forwardRef<TipTapEditorRef, TipTapEditorWebProps>(
   ({ initialContent, onContentChange, onSelectionChange, onReady, onFocus, onBlur, onAnchorPositions, onMarginNoteDeleted, style }, ref) => {
     // Track previous anchor IDs to detect deletions
-    const previousAnchorIdsRef = React.useRef<Set<string>>(new Set());
+    const previousAnchorIdsRef = useRef<Set<string>>(new Set());
 
     // Get anchor positions from the editor document
-    const getAnchorPositionsFromEditor = React.useCallback((editorInstance: any) => {
+    const getAnchorPositionsFromEditor = useCallback((editorInstance: any) => {
       if (!editorInstance) return [];
       
-      const positions: AnchorPosition[] = [];
+      const positions: MarginNoteData[] = [];
       let blockIndex = 0;
       let line = 0;
       
@@ -52,13 +53,17 @@ export const TipTapEditorWeb = forwardRef<TipTapEditorRef, TipTapEditorWebProps>
     }, []);
 
     // Send anchor positions and detect deletions
-    const sendAnchorPositions = React.useCallback((editorInstance: any) => {
+    const sendAnchorPositions = useCallback((editorInstance: any) => {
       const positions = getAnchorPositionsFromEditor(editorInstance);
       
       // Detect deleted anchors
       const currentIds = new Set(positions.map(p => p.id));
       previousAnchorIdsRef.current.forEach(id => {
         if (!currentIds.has(id)) {
+          // Clean up the highlight associated with this deleted anchor
+          // (the anchor is already deleted, but the highlight may remain)
+          editorInstance.commands.deleteMarginNote(id);
+          
           onMarginNoteDeleted?.(id);
         }
       });
@@ -69,7 +74,7 @@ export const TipTapEditorWeb = forwardRef<TipTapEditorRef, TipTapEditorWebProps>
 
     const editor = useEditor({
       extensions: [StarterKit, Square, Circle, Flower, MarginNote, NoteHighlight],
-      content: initialContent || '<p>Start typing...</p>',
+      content: initialContent || '',
       onUpdate: ({ editor }) => {
         onContentChange?.({
           html: editor.getHTML(),
@@ -156,22 +161,14 @@ export const TipTapEditorWeb = forwardRef<TipTapEditorRef, TipTapEditorWebProps>
     }), [editor, sendAnchorPositions]);
 
     return (
-      <View style={[styles.container, style]}>
-        <EditorContent editor={editor} style={styles.editorContent} />
-      </View>
+      <div 
+        className={styles.wrapper}
+        style={style as CSSProperties}
+      >
+        <EditorContent editor={editor} />
+      </div>
     );
   }
 );
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  editorContent: {
-    flex: 1,
-    padding: 16,
-  } as any,
-});
 
 export default TipTapEditorWeb;
