@@ -1,6 +1,13 @@
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import { Square, Circle, Flower, MarginNoteBlock } from '@prose/tiptap-extensions';
+import {
+  MarginEditorEvent,
+  MarginEditorCommand,
+  createBaseMessage,
+} from './protocol';
+
+const DEBUG = process.env.NODE_ENV === 'development';
 
 // Declare the ReactNativeWebView interface for type safety
 declare global {
@@ -13,31 +20,20 @@ declare global {
   }
 }
 
-// Message types for communication with React Native
-type MessageToRN = {
-  type: 'content-change' | 'content-response' | 'editor-ready' | 'selection-change' | 'editor-focus' | 'editor-blur' | 'note-block-focus' | 'delete-margin-note';
-  payload: any;
-};
-
-type MessageFromRN = {
-  type: 'set-content' | 'get-content' | 'focus' | 'blur' | 'toggle-bold' | 'toggle-italic' 
-      | 'insert-square' | 'insert-circle' | 'insert-flower'
-      | 'insert-note-block' | 'delete-note-block' | 'update-note-block-index' | 'update-all-note-block-indices'
-      | 'focus-note-block';
-  payload?: any;
-};
-
-// Send message to React Native
-function sendToRN(message: MessageToRN) {
+// Send typed message to React Native
+function sendToRN(event: MarginEditorEvent) {
   if (window.ReactNativeWebView) {
-    window.ReactNativeWebView.postMessage(JSON.stringify(message));
+    if (DEBUG) {
+      console.log('[MarginEditor] Sending:', event.type, event.payload);
+    }
+    window.ReactNativeWebView.postMessage(JSON.stringify(event));
   }
 }
 
 // Debug log that sends to React Native
 function debugLog(tag: string, ...args: any[]) {
   console.log(tag, ...args);
-  if (window.ReactNativeWebView) {
+  if (DEBUG && window.ReactNativeWebView) {
     window.ReactNativeWebView.postMessage(JSON.stringify({
       type: 'debug-log',
       payload: { tag, message: args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ') },
@@ -66,7 +62,8 @@ function initEditor() {
         onDeleteNote: (noteId: string) => {
           // Send message to React Native to delete the anchor in main editor
           sendToRN({
-            type: 'delete-margin-note',
+            ...createBaseMessage(),
+            type: 'DELETE_MARGIN_NOTE',
             payload: { noteId },
           });
         },
@@ -75,7 +72,8 @@ function initEditor() {
     content: initialContent,
     onUpdate: ({ editor }) => {
       sendToRN({
-        type: 'content-change',
+        ...createBaseMessage(),
+        type: 'CONTENT_CHANGED',
         payload: {
           html: editor.getHTML(),
           json: editor.getJSON(),
@@ -84,7 +82,8 @@ function initEditor() {
     },
     onSelectionUpdate: ({ editor }) => {
       sendToRN({
-        type: 'selection-change',
+        ...createBaseMessage(),
+        type: 'SELECTION_CHANGED',
         payload: {
           isBold: editor.isActive('bold'),
           isItalic: editor.isActive('italic'),
@@ -118,7 +117,8 @@ function initEditor() {
       if (currentNoteId !== lastFocusedNoteId) {
         lastFocusedNoteId = currentNoteId;
         sendToRN({
-          type: 'note-block-focus',
+          ...createBaseMessage(),
+          type: 'NOTE_BLOCK_FOCUS',
           payload: { noteId: currentNoteId },
         });
       }
@@ -126,7 +126,8 @@ function initEditor() {
     onFocus: ({ editor }) => {
       debugLog('[MarginEditor]', 'onFocus triggered');
       sendToRN({
-        type: 'editor-focus',
+        ...createBaseMessage(),
+        type: 'EDITOR_FOCUS',
         payload: {},
       });
       
@@ -145,7 +146,8 @@ function initEditor() {
       if (currentNoteId) {
         lastFocusedNoteId = currentNoteId;
         sendToRN({
-          type: 'note-block-focus',
+          ...createBaseMessage(),
+          type: 'NOTE_BLOCK_FOCUS',
           payload: { noteId: currentNoteId },
         });
       }
@@ -153,12 +155,14 @@ function initEditor() {
     onBlur: () => {
       debugLog('[MarginEditor]', 'onBlur triggered');
       sendToRN({
-        type: 'editor-blur',
+        ...createBaseMessage(),
+        type: 'EDITOR_BLUR',
         payload: {},
       });
       lastFocusedNoteId = null;
       sendToRN({
-        type: 'note-block-focus',
+        ...createBaseMessage(),
+        type: 'NOTE_BLOCK_FOCUS',
         payload: { noteId: null },
       });
     },
@@ -187,69 +191,74 @@ function initEditor() {
 
   // Handle messages from React Native
   function handleMessage(event: MessageEvent) {
-    let data: MessageFromRN;
+    let data: MarginEditorCommand;
     try {
       data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
     } catch {
       return;
     }
 
+    if (DEBUG) {
+      console.log('[MarginEditor] Received:', data.type);
+    }
+
     switch (data.type) {
-      case 'set-content':
-        editor.commands.setContent(data.payload);
+      case 'SET_CONTENT':
+        editor.commands.setContent(data.payload.content);
         break;
-      case 'get-content':
+      case 'GET_CONTENT':
         sendToRN({
-          type: 'content-response',
+          ...createBaseMessage(data.correlationId),
+          type: 'CONTENT_RESPONSE',
           payload: {
-            messageId: data.payload?.messageId,
+            messageId: data.payload.messageId,
             html: editor.getHTML(),
             json: editor.getJSON(),
           },
         });
         break;
-      case 'focus':
+      case 'FOCUS':
         editor.commands.focus();
         break;
-      case 'blur':
+      case 'BLUR':
         editor.commands.blur();
         break;
-      case 'toggle-bold':
+      case 'TOGGLE_BOLD':
         editor.chain().focus().toggleBold().run();
         break;
-      case 'toggle-italic':
+      case 'TOGGLE_ITALIC':
         editor.chain().focus().toggleItalic().run();
         break;
-      case 'insert-square':
+      case 'INSERT_SQUARE':
         editor.chain().focus().insertSquare(data.payload || {}).run();
         break;
-      case 'insert-circle':
+      case 'INSERT_CIRCLE':
         editor.chain().focus().insertCircle(data.payload || {}).run();
         break;
-      case 'insert-flower':
+      case 'INSERT_FLOWER':
         editor.chain().focus().insertFlower(data.payload || {}).run();
         break;
-      case 'insert-note-block': {
-        debugLog('[MarginEditor]', 'insert-note-block received:', data.payload);
+      case 'INSERT_NOTE_BLOCK': {
+        debugLog('[MarginEditor]', 'INSERT_NOTE_BLOCK received:', data.payload);
         const { noteId, noteIndex } = data.payload;
         editor.chain().insertMarginNoteBlock(noteId, noteIndex).run();
-        debugLog('[MarginEditor]', 'insert-note-block done, NOT focusing');
+        debugLog('[MarginEditor]', 'INSERT_NOTE_BLOCK done, NOT focusing');
         // Don't auto-focus the new note block - let the user decide where to focus
         // This prevents stealing focus from the main editor
         break;
       }
-      case 'delete-note-block':
-        debugLog('[MarginEditor]', 'delete-note-block received:', data.payload);
+      case 'DELETE_NOTE_BLOCK':
+        debugLog('[MarginEditor]', 'DELETE_NOTE_BLOCK received:', data.payload);
         editor.commands.deleteMarginNoteBlock(data.payload.noteId);
         // After deletion, blur the editor to prevent focus issues
         // The user can click to focus whatever editor they want
         editor.commands.blur();
-        debugLog('[MarginEditor]', 'delete-note-block done, blurred');
+        debugLog('[MarginEditor]', 'DELETE_NOTE_BLOCK done, blurred');
         break;
-      case 'update-note-block-index':
+      case 'UPDATE_NOTE_BLOCK_INDEX':
         editor.commands.updateMarginNoteBlockIndex(data.payload.noteId, data.payload.noteIndex);
         break;
-      case 'update-all-note-block-indices': {
+      case 'UPDATE_ALL_NOTE_BLOCK_INDICES': {
         const indices = data.payload.indices as { noteId: string; noteIndex: number }[];
         const { tr, doc } = editor.state;
         
@@ -271,7 +280,7 @@ function initEditor() {
         }
         break;
       }
-      case 'focus-note-block':
+      case 'FOCUS_NOTE_BLOCK':
         focusNoteBlock(data.payload.noteId);
         break;
     }
@@ -283,7 +292,8 @@ function initEditor() {
 
   // Notify React Native that editor is ready
   sendToRN({
-    type: 'editor-ready',
+    ...createBaseMessage(),
+    type: 'EDITOR_READY',
     payload: { success: true },
   });
 }

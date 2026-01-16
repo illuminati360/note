@@ -31,14 +31,6 @@ import {
 // CONTEXT TYPES
 // ============================================
 
-/**
- * Represents which editor is currently focused.
- * - 'main' = main editor
- * - string (other) = note ID
- * - null = nothing focused
- */
-export type FocusedEditor = 'main' | string | null;
-
 export interface MarginNotesContextType {
   // Focus state (read-only)
   focusState: FocusState;
@@ -58,12 +50,6 @@ export interface MarginNotesContextType {
   blurMainEditor: () => void;
   blurNote: () => void;
   resetFocus: () => void;
-  
-  // Legacy compatibility (maps to state machine)
-  /** @deprecated Use focusState directly */
-  focusedEditor: FocusedEditor;
-  /** @deprecated Use dispatchFocus with appropriate event */
-  setFocusedEditor: (editor: FocusedEditor) => void;
 }
 
 // ============================================
@@ -139,37 +125,6 @@ export function MarginNotesProvider({
     dispatchFocus({ type: 'RESET' });
   }, [dispatchFocus]);
 
-  // Legacy compatibility: convert state to old format
-  const focusedEditor = useMemo((): FocusedEditor => {
-    switch (focusState.type) {
-      case 'MAIN_FOCUSED':
-        return 'main';
-      case 'NOTE_FOCUSED':
-        return focusState.noteId;
-      case 'IDLE':
-        return null;
-    }
-  }, [focusState]);
-
-  // Legacy compatibility: convert old setter to state machine events
-  const setFocusedEditor = useCallback(
-    (editor: FocusedEditor) => {
-      if (editor === null) {
-        // Blur current editor
-        if (focusState.type === 'MAIN_FOCUSED') {
-          dispatchFocus({ type: 'MAIN_EDITOR_BLUR' });
-        } else if (focusState.type === 'NOTE_FOCUSED') {
-          dispatchFocus({ type: 'NOTE_BLUR' });
-        }
-      } else if (editor === 'main') {
-        dispatchFocus({ type: 'MAIN_EDITOR_FOCUS' });
-      } else {
-        dispatchFocus({ type: 'NOTE_FOCUS', noteId: editor });
-      }
-    },
-    [focusState, dispatchFocus]
-  );
-
   // Derived values
   const contextValue = useMemo(
     (): MarginNotesContextType => ({
@@ -184,9 +139,6 @@ export function MarginNotesProvider({
       blurMainEditor,
       blurNote,
       resetFocus,
-      // Legacy
-      focusedEditor,
-      setFocusedEditor,
     }),
     [
       focusState,
@@ -196,8 +148,6 @@ export function MarginNotesProvider({
       blurMainEditor,
       blurNote,
       resetFocus,
-      focusedEditor,
-      setFocusedEditor,
     ]
   );
 
@@ -255,22 +205,6 @@ export function useFocus() {
     blurMainEditor,
     blurNote,
     resetFocus,
-  };
-}
-
-/**
- * Legacy hook for backwards compatibility.
- * @deprecated Use useMarginNotes() or useFocus() instead.
- */
-export function useEditorFocus() {
-  const { focusedEditor, setFocusedEditor, isMainEditorFocused, focusedNoteId } =
-    useMarginNotes();
-
-  return {
-    focusedEditor,
-    setFocusedEditor,
-    isMainEditorFocused,
-    focusedNoteId,
   };
 }
 

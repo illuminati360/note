@@ -1,10 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { useRef, useState, useCallback, useEffect } from 'react';
-import { TipTapEditor, TipTapEditorRef, EditorState, EditorContent, MarginNoteData, EditorFocusProvider, useEditorFocus } from './src/editor';
+import { useRef, useState, useCallback } from 'react';
+import { TipTapEditor, TipTapEditorRef, EditorState, EditorContent, MarginNoteData, MarginNotesProvider, useFocus } from './src/editor';
 import { SquareIcon, CircleIcon, FlowerIcon } from './src/components/ShapeIcons';
 import { MarginNotesPanel, MarginNotesPanelRef } from './src/components/MarginNotesPanel';
+import { reconcile, type NoteData } from './src/margin-notes';
 
 // Generate unique ID
 function generateId(): string {
@@ -15,7 +16,7 @@ function generateId(): string {
 function AppContent() {
 	const editorRef = useRef<TipTapEditorRef>(null);
 	const notesPanelRef = useRef<MarginNotesPanelRef>(null);
-	const { focusedEditor, setFocusedEditor, isMainEditorFocused, focusedNoteId } = useEditorFocus();
+	const { isMainEditorFocused, focusedNoteId, hasAnyEditorFocus, focusMainEditor } = useFocus();
 	
 	const [editorState, setEditorState] = useState<EditorState>({
 		isBold: false,
@@ -30,6 +31,10 @@ function AppContent() {
 	// Margin notes state
 	const [marginNotes, setMarginNotes] = useState<MarginNoteData[]>([]);
 	const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
+	
+	// Ref to track latest margin notes (prevents stale closure in callbacks)
+	const marginNotesRef = useRef<MarginNoteData[]>([]);
+	marginNotesRef.current = marginNotes;
 
 	const handleContentChange = useCallback((content: EditorContent) => {
 	}, []);
@@ -41,78 +46,108 @@ function AppContent() {
 	const handleReady = useCallback(() => {
 	}, []);
 
-	// Track when main editor is focused
+	// Track when main editor is focused - use the state machine
 	const handleEditorFocus = useCallback(() => {
-		setFocusedEditor('main');
-	}, [setFocusedEditor]);
+		focusMainEditor();
+	}, [focusMainEditor]);
 
 	// Insert a new margin note
-	// Only insert anchor in main editor - the sync will be handled by syncMarginNotes
+	// Only insert anchor in main editor - the reconciler will handle sync
 	const handleInsertMarginNote = useCallback(() => {
 		const id = generateId();
 		const noteIndex = marginNotes.length + 1;
 		
 		// Only insert anchor in main editor
-		// The margin note block will be created by syncMarginNotes when it detects the new anchor
+		// The margin note block will be created by handleAnchorsChanged via reconciler
 		editorRef.current?.insertMarginNote(id, noteIndex);
 		
 		setSelectedNoteId(id);
 	}, [marginNotes.length]);
 
-	// Track previous notes to detect changes
-	const prevNotesRef = useRef<MarginNoteData[]>([]);
-
-	// Handle anchor positions update from editor - this gives us the document order
+	// Handle anchor positions update from editor using the reconciler
 	// This is the SINGLE SOURCE OF TRUTH for syncing anchors with margin notes
-	const syncMarginNotes = useCallback((positions: MarginNoteData[]) => {
-		// Sort positions by document order (line number)
-		const sortedPositions = [...positions].sort((a, b) => a.line - b.line);
-		
-		// Build new notes array based on anchor order
-		const updatedNotes: MarginNoteData[] = sortedPositions.map((pos, index) => ({
-			id: pos.id,
-			noteIndex: index + 1,
-			line: pos.line,
-			blockIndex: pos.blockIndex,
+	const handleAnchorsChanged = useCallback((anchors: MarginNoteData[]) => {
+		// Convert to reconciler format
+		const anchorData = anchors.map(a => ({
+			id: a.id,
+			line: a.line,
+			blockIndex: a.blockIndex,
 		}));
-
+		
+		// Use ref to get latest notes (prevents stale closure issue)
+		const currentNotes = marginNotesRef.current;
+		
+		console.log('[Reconciler] Input:', {
+			anchors: anchorData.map(a => a.id),
+			currentNotes: currentNotes.map(n => n.id),
+		});
+		
+		// Run reconciler to compute new notes and commands
+		const { notes: newNotes, commands, diff } = reconcile({
+			anchors: anchorData,
+			currentNotes: currentNotes.map(n => ({
+				id: n.id,
+				noteIndex: n.noteIndex,
+				line: n.line,
+				blockIndex: n.blockIndex,
+			})),
+		});
+		
+		console.log('[Reconciler] Output:', {
+			hasChanges: diff.hasChanges,
+			commands: commands.map(c => c.type),
+			newNotes: newNotes.map(n => n.id),
+		});
+		
+		// Skip if no changes
+		if (!diff.hasChanges) {
+			return;
+		}
+		
+		// Execute commands on the margin editor
+		commands.forEach(cmd => {
+			switch (cmd.type) {
+				case 'INSERT_NOTE_BLOCK':
+					notesPanelRef.current?.insertNoteBlock(cmd.payload.noteId, cmd.payload.noteIndex);
+					break;
+				case 'DELETE_NOTE_BLOCK':
+					notesPanelRef.current?.deleteNoteBlock(cmd.payload.noteId);
+					// Clear selection if deleted note was selected
+					if (selectedNoteId === cmd.payload.noteId) {
+						setSelectedNoteId(null);
+					}
+					break;
+				case 'UPDATE_NOTE_INDICES':
+					notesPanelRef.current?.updateNoteIndices(
+						cmd.payload.notes.map(n => ({
+							id: n.noteId,
+							noteIndex: n.noteIndex,
+							line: 0, // Not needed for updateNoteIndices
+							blockIndex: 0,
+						}))
+					);
+					break;
+			}
+		});
+		
+		// Update state AND ref immediately (ref prevents stale closure on next call)
+		const updatedNotes = newNotes.map(n => ({
+			id: n.id,
+			noteIndex: n.noteIndex,
+			line: n.line,
+			blockIndex: n.blockIndex,
+		}));
+		marginNotesRef.current = updatedNotes;
 		setMarginNotes(updatedNotes);
-	}, []);
-
-	// Sync MarginEditor with marginNotes state changes
-	useEffect(() => {
-		const prev = prevNotesRef.current;
-		const current = marginNotes;
 		
-		const prevIds = new Set(prev.map(n => n.id));
-		const currentIds = new Set(current.map(n => n.id));
-		
-		// Delete removed notes first
-		prev.forEach(note => {
-			if (!currentIds.has(note.id)) {
-				notesPanelRef.current?.deleteNoteBlock(note.id);
-			}
-		});
-		
-		// Insert new notes
-		current.forEach(note => {
-			if (!prevIds.has(note.id)) {
-				notesPanelRef.current?.insertNoteBlock(note.id, note.noteIndex);
-			}
-		});
-		
-		// Update all note block indices
-		notesPanelRef.current?.updateNoteIndices(current);
-		
-		prevNotesRef.current = current;
-	}, [marginNotes]);
+		console.log('[Reconciler] State updated, ref now has:', marginNotesRef.current.map(n => n.id));
+	}, [selectedNoteId]);
 
 	// Handle margin note deleted from editor (anchor was deleted)
-	// Note: This is now handled in syncMarginNotes, but we keep this
-	// for immediate feedback when user explicitly deletes an anchor
+	// This is now handled by the reconciler in handleAnchorsChanged
 	const handleMarginNoteDeleted = useCallback((id: string) => {
-		// The actual deletion will be handled by syncMarginNotes
-		// when it receives the updated positions
+		// The reconciler will handle deletion when it receives updated anchors
+		// Just clear selection if this note was selected
 		if (selectedNoteId === id) {
 			setSelectedNoteId(null);
 		}
@@ -141,7 +176,7 @@ function AppContent() {
 			const marginEditor = notesPanelRef.current?.getMarginEditorRef();
 			marginEditor?.toggleBold();
 		}
-	}, [isMainEditorFocused, focusedNoteId, focusedEditor]);
+	}, [isMainEditorFocused, focusedNoteId]);
 
 	const handleToggleItalic = useCallback(() => {
 		if (isMainEditorFocused) {
@@ -175,8 +210,6 @@ function AppContent() {
 		}
 	}, [isMainEditorFocused, focusedNoteId]);
 
-	const hasEditorFocus = focusedEditor !== null;
-
 	return (
 		<SafeAreaView style={styles.container}>
 			<StatusBar style="auto" />
@@ -187,15 +220,15 @@ function AppContent() {
 					style={[
 						styles.toolbarButton, 
 						editorState.isBold && styles.toolbarButtonActive,
-						!hasEditorFocus && styles.toolbarButtonDisabled,
+						!hasAnyEditorFocus && styles.toolbarButtonDisabled,
 					]}
 					onPress={handleToggleBold}
-					disabled={!hasEditorFocus}
+					disabled={!hasAnyEditorFocus}
 				>
 					<Text style={[
 						styles.toolbarButtonText, 
 						editorState.isBold && styles.toolbarButtonTextActive,
-						!hasEditorFocus && styles.toolbarButtonTextDisabled,
+						!hasAnyEditorFocus && styles.toolbarButtonTextDisabled,
 					]}>
 						B
 					</Text>
@@ -205,16 +238,16 @@ function AppContent() {
 					style={[
 						styles.toolbarButton, 
 						editorState.isItalic && styles.toolbarButtonActive,
-						!hasEditorFocus && styles.toolbarButtonDisabled,
+						!hasAnyEditorFocus && styles.toolbarButtonDisabled,
 					]}
 					onPress={handleToggleItalic}
-					disabled={!hasEditorFocus}
+					disabled={!hasAnyEditorFocus}
 				>
 					<Text style={[
 						styles.toolbarButtonText, 
 						editorState.isItalic && styles.toolbarButtonTextActive, 
 						{ fontStyle: 'italic' },
-						!hasEditorFocus && styles.toolbarButtonTextDisabled,
+						!hasAnyEditorFocus && styles.toolbarButtonTextDisabled,
 					]}>
 						I
 					</Text>
@@ -223,25 +256,25 @@ function AppContent() {
 				<View style={styles.separator} />
 
 				<TouchableOpacity
-					style={[styles.shapeButton, !hasEditorFocus && styles.toolbarButtonDisabled]}
+					style={[styles.shapeButton, !hasAnyEditorFocus && styles.toolbarButtonDisabled]}
 					onPress={handleInsertSquare}
-					disabled={!hasEditorFocus}
+					disabled={!hasAnyEditorFocus}
 				>
-					<SquareIcon size={20} color={hasEditorFocus ? undefined : '#ccc'} />
+					<SquareIcon size={20} color={hasAnyEditorFocus ? undefined : '#ccc'} />
 				</TouchableOpacity>
 				<TouchableOpacity
-					style={[styles.shapeButton, !hasEditorFocus && styles.toolbarButtonDisabled]}
+					style={[styles.shapeButton, !hasAnyEditorFocus && styles.toolbarButtonDisabled]}
 					onPress={handleInsertCircle}
-					disabled={!hasEditorFocus}
+					disabled={!hasAnyEditorFocus}
 				>
-					<CircleIcon size={20} color={hasEditorFocus ? undefined : '#ccc'} />
+					<CircleIcon size={20} color={hasAnyEditorFocus ? undefined : '#ccc'} />
 				</TouchableOpacity>
 				<TouchableOpacity
-					style={[styles.shapeButton, !hasEditorFocus && styles.toolbarButtonDisabled]}
+					style={[styles.shapeButton, !hasAnyEditorFocus && styles.toolbarButtonDisabled]}
 					onPress={handleInsertFlower}
-					disabled={!hasEditorFocus}
+					disabled={!hasAnyEditorFocus}
 				>
-					<FlowerIcon size={20} color={hasEditorFocus ? 'lightgray' : '#ccc'} />
+					<FlowerIcon size={20} color={hasAnyEditorFocus ? 'lightgray' : '#ccc'} />
 				</TouchableOpacity>
 
 				<View style={styles.separator} />
@@ -264,7 +297,7 @@ function AppContent() {
 					onSelectionChange={handleSelectionChange}
 					onReady={handleReady}
 					onFocus={handleEditorFocus}
-					onAnchorPositions={syncMarginNotes}
+					onAnchorPositions={handleAnchorsChanged}
 					onMarginNoteDeleted={handleMarginNoteDeleted}
 					style={styles.editor}
 				/>
@@ -286,9 +319,9 @@ function AppContent() {
 export default function App() {
 	return (
 		<SafeAreaProvider>
-			<EditorFocusProvider>
+			<MarginNotesProvider>
 				<AppContent />
-			</EditorFocusProvider>
+			</MarginNotesProvider>
 		</SafeAreaProvider>
 	);
 }

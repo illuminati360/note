@@ -5,11 +5,11 @@ import { StyleSheet, View, Text } from 'react-native';
 import { Square, Circle, Flower, MarginNoteBlock } from '@prose/tiptap-extensions';
 import type { EditorState, EditorContent as EditorContentType, SquareAttributes, CircleAttributes, FlowerAttributes } from './TipTapEditor';
 import type { MarginEditorRef, MarginEditorProps } from './MarginEditor';
-import { useEditorFocus } from './EditorFocusContext';
+import { useFocus } from '../margin-notes';
 
 export const MarginEditor = forwardRef<MarginEditorRef, MarginEditorProps>(
   ({ initialContent, onContentChange, onSelectionChange, onFocus, onBlur, onNoteBlockFocus, onDeleteNote, style }, ref) => {
-    const { setFocusedEditor } = useEditorFocus();
+    const { focusNote } = useFocus();
     const lastFocusedNoteId = useRef<string | null>(null);
 
     const editor = useEditor({
@@ -68,7 +68,7 @@ export const MarginEditor = forwardRef<MarginEditorRef, MarginEditorProps>(
           lastFocusedNoteId.current = currentNoteId;
           onNoteBlockFocus?.(currentNoteId);
           if (currentNoteId) {
-            setFocusedEditor(currentNoteId);
+            focusNote(currentNoteId);
           }
         }
       },
@@ -90,7 +90,7 @@ export const MarginEditor = forwardRef<MarginEditorRef, MarginEditorProps>(
         if (currentNoteId) {
           lastFocusedNoteId.current = currentNoteId;
           onNoteBlockFocus?.(currentNoteId);
-          setFocusedEditor(currentNoteId);
+          focusNote(currentNoteId);
         }
       },
       onBlur: () => {
@@ -204,11 +204,7 @@ export const MarginEditor = forwardRef<MarginEditorRef, MarginEditorProps>(
       },
       focusNoteBlock,
       toggleBold: () => {
-        console.log('MarginEditor.toggleBold called, editor:', !!editor);
-        if (editor) {
-          const result = editor.chain().focus().toggleBold().run();
-          console.log('toggleBold result:', result);
-        }
+        editor?.chain().focus().toggleBold().run();
       },
       toggleItalic: () => {
         editor?.chain().focus().toggleItalic().run();

@@ -3,8 +3,11 @@ import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 import { editorHtml } from './editorHtml';
 import { asyncMessages } from './AsyncMessages';
+import { createBaseMessage } from '../protocol/messages';
 import type { SquareAttributes, CircleAttributes, FlowerAttributes, MarginNoteAttributes } from '@prose/tiptap-extensions';
 import type { MarginNoteData } from '../components/MarginNotesPanel';
+
+const DEBUG = __DEV__;
 
 // Re-export shape attributes for consumers
 export type { SquareAttributes, CircleAttributes, FlowerAttributes, MarginNoteAttributes } from '@prose/tiptap-extensions';
@@ -63,10 +66,17 @@ export const TipTapEditor = forwardRef<TipTapEditorRef, TipTapEditorProps>(
     const webViewRef = useRef<WebView>(null);
     const [isReady, setIsReady] = useState(false);
 
-    // Send message to the WebView
-    const sendMessage = useCallback((type: string, payload?: any) => {
+    // Send typed message to the WebView
+    const sendCommand = useCallback((type: string, payload?: any) => {
       if (webViewRef.current) {
-        const message = JSON.stringify({ type, payload });
+        const message = JSON.stringify({
+          ...createBaseMessage(),
+          type,
+          payload,
+        });
+        if (DEBUG) {
+          console.log('[TipTapEditor] Sending:', type);
+        }
         webViewRef.current.injectJavaScript(`
           window.postMessage(${JSON.stringify(message)}, '*');
           true;
@@ -78,17 +88,21 @@ export const TipTapEditor = forwardRef<TipTapEditorRef, TipTapEditorProps>(
     const handleMessage = useCallback((event: WebViewMessageEvent) => {
       try {
         const data = JSON.parse(event.nativeEvent.data);
+
+        if (DEBUG) {
+          console.log('[TipTapEditor] Received:', data.type);
+        }
         
         switch (data.type) {
-          case 'editor-ready':
+          case 'EDITOR_READY':
             setIsReady(true);
             onReady?.();
             break;
-          case 'content-change':
+          case 'CONTENT_CHANGED':
             // Content changed by user editing
             onContentChange?.(data.payload);
             break;
-          case 'content-response':
+          case 'CONTENT_RESPONSE':
             // Response to getContent request, match by messageId
             if (data.payload?.messageId) {
               asyncMessages.handleResponse(data.payload.messageId, {
@@ -97,20 +111,20 @@ export const TipTapEditor = forwardRef<TipTapEditorRef, TipTapEditorProps>(
               });
             }
             break;
-          case 'selection-change':
+          case 'SELECTION_CHANGED':
             onSelectionChange?.(data.payload);
             break;
-          case 'anchor-positions':
+          case 'ANCHORS_CHANGED':
             onAnchorPositions?.(data.payload.positions);
             break;
-          case 'margin-note-deleted':
+          case 'MARGIN_NOTE_DELETED':
             onMarginNoteDeleted?.(data.payload.id);
             break;
-          case 'editor-focus':
+          case 'EDITOR_FOCUS':
             onFocus?.();
-            console.log("main editor focus event received")
+            if (DEBUG) console.log('[TipTapEditor] Focus event received');
             break;
-          case 'editor-blur':
+          case 'EDITOR_BLUR':
             onBlur?.();
             break;
         }
@@ -121,32 +135,32 @@ export const TipTapEditor = forwardRef<TipTapEditorRef, TipTapEditorProps>(
 
     // Expose methods via ref
     useImperativeHandle(ref, () => ({
-      setContent: (content: string) => sendMessage('set-content', content),
+      setContent: (content: string) => sendCommand('SET_CONTENT', { content }),
       getContent: () => {
         return asyncMessages.sendAsyncMessage<EditorContent>(
-          'get-content',
-          sendMessage,
+          'GET_CONTENT',
+          sendCommand,
           5000  // 5 second timeout
         );
       },
-      focus: () => sendMessage('focus'),
-      blur: () => sendMessage('blur'),
-      toggleBold: () => sendMessage('toggle-bold'),
-      toggleItalic: () => sendMessage('toggle-italic'),
-      insertSquare: (attrs?: SquareAttributes) => sendMessage('insert-square', attrs || {}),
-      insertCircle: (attrs?: CircleAttributes) => sendMessage('insert-circle', attrs || {}),
-      insertFlower: (attrs?: FlowerAttributes) => sendMessage('insert-flower', attrs || {}),
-      insertMarginNote: (id: string, noteIndex: number) => sendMessage('insert-margin-note', { id, noteIndex }),
-      deleteMarginNote: (id: string) => sendMessage('delete-margin-note', { id }),
-      getAnchorPositions: () => sendMessage('get-anchor-positions'),
-    }), [sendMessage]);
+      focus: () => sendCommand('FOCUS'),
+      blur: () => sendCommand('BLUR'),
+      toggleBold: () => sendCommand('TOGGLE_BOLD'),
+      toggleItalic: () => sendCommand('TOGGLE_ITALIC'),
+      insertSquare: (attrs?: SquareAttributes) => sendCommand('INSERT_SQUARE', attrs || {}),
+      insertCircle: (attrs?: CircleAttributes) => sendCommand('INSERT_CIRCLE', attrs || {}),
+      insertFlower: (attrs?: FlowerAttributes) => sendCommand('INSERT_FLOWER', attrs || {}),
+      insertMarginNote: (id: string, noteIndex: number) => sendCommand('INSERT_MARGIN_NOTE', { id, noteIndex }),
+      deleteMarginNote: (id: string) => sendCommand('DELETE_MARGIN_NOTE', { id }),
+      getAnchorPositions: () => sendCommand('GET_ANCHOR_POSITIONS'),
+    }), [sendCommand]);
 
     // Inject initial content when ready
     useEffect(() => {
       if (isReady && initialContent) {
-        sendMessage('set-content', initialContent);
+        sendCommand('SET_CONTENT', { content: initialContent });
       }
-    }, [isReady, initialContent, sendMessage]);
+    }, [isReady, initialContent, sendCommand]);
 
     // Inject initial content script before page loads
     const injectedJavaScript = initialContent

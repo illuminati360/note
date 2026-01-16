@@ -164,66 +164,6 @@ export function isMarginEditorEvent(msg: unknown): msg is MarginEditorEvent {
 }
 
 // ============================================
-// LEGACY MESSAGE MAPPING
-// ============================================
-
-/**
- * Maps legacy message types to new protocol types.
- * Use this during migration to support both old and new formats.
- */
-export const LegacyMainEditorMessageMap = {
-  // Main Editor events (old → new)
-  'editor-ready': 'EDITOR_READY',
-  'editor-focus': 'EDITOR_FOCUS',
-  'editor-blur': 'EDITOR_BLUR',
-  'content-change': 'CONTENT_CHANGED',
-  'selection-change': 'SELECTION_CHANGED',
-  'anchor-positions': 'ANCHORS_CHANGED',
-  'content-response': 'CONTENT_RESPONSE',
-  
-  // Main Editor commands (old → new)
-  'set-content': 'SET_CONTENT',
-  'get-content': 'GET_CONTENT',
-  'focus': 'FOCUS',
-  'blur': 'BLUR',
-  'toggle-bold': 'FORMAT',
-  'toggle-italic': 'FORMAT',
-  'insert-square': 'INSERT_SHAPE',
-  'insert-circle': 'INSERT_SHAPE',
-  'insert-flower': 'INSERT_SHAPE',
-  'insert-margin-note': 'INSERT_MARGIN_NOTE',
-  'delete-margin-note': 'DELETE_MARGIN_NOTE',
-} as const;
-
-export const LegacyMarginEditorMessageMap = {
-  // Margin Editor events (old → new)
-  'editor-ready': 'EDITOR_READY',
-  'editor-focus': 'EDITOR_FOCUS',
-  'editor-blur': 'EDITOR_BLUR',
-  'content-change': 'CONTENT_CHANGED',
-  'selection-change': 'SELECTION_CHANGED',
-  'note-block-focus': 'EDITOR_FOCUS',
-  'delete-margin-note': 'NOTE_DELETED',
-  'content-response': 'CONTENT_RESPONSE',
-  
-  // Margin Editor commands (old → new)
-  'set-content': 'SET_CONTENT',
-  'get-content': 'GET_CONTENT',
-  'focus': 'FOCUS',
-  'blur': 'BLUR',
-  'toggle-bold': 'FORMAT',
-  'toggle-italic': 'FORMAT',
-  'insert-square': 'INSERT_SHAPE',
-  'insert-circle': 'INSERT_SHAPE',
-  'insert-flower': 'INSERT_SHAPE',
-  'insert-note-block': 'INSERT_NOTE_BLOCK',
-  'delete-note-block': 'DELETE_NOTE_BLOCK',
-  'update-note-block-index': 'UPDATE_NOTE_INDICES',
-  'update-all-note-block-indices': 'UPDATE_NOTE_INDICES',
-  'focus-note-block': 'FOCUS_NOTE',
-} as const;
-
-// ============================================
 // DEBUG HELPERS
 // ============================================
 

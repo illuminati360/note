@@ -1,6 +1,6 @@
 import React, { forwardRef, useImperativeHandle, useRef, useCallback, useEffect } from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
-import { MarginEditor, MarginEditorRef, EditorContent, useEditorFocus } from '../editor';
+import { MarginEditor, MarginEditorRef, EditorContent, useFocus } from '../editor';
 
 export interface MarginNoteData {
   id: string;
@@ -34,7 +34,7 @@ interface MarginNotesPanelProps {
 export const MarginNotesPanel = forwardRef<MarginNotesPanelRef, MarginNotesPanelProps>(
   function MarginNotesPanel({ notes, onContentChange, onNoteBlockFocus, onDeleteNote, style }, ref) {
     const marginEditorRef = useRef<MarginEditorRef>(null);
-    const { focusedNoteId } = useEditorFocus();
+    const { focusedNoteId } = useFocus();
 
     // Update note block indices when notes change
     useEffect(() => {

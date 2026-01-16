@@ -1,8 +1,7 @@
 /**
  * Tests for MarginNotesContext
  * 
- * Verifies that the React context correctly integrates the focus state machine
- * and provides backwards-compatible API.
+ * Verifies that the React context correctly integrates the focus state machine.
  */
 
 import React from 'react';
@@ -11,7 +10,6 @@ import {
   MarginNotesProvider,
   useMarginNotes,
   useFocus,
-  useEditorFocus,
 } from '../MarginNotesContext';
 
 // Wrapper component for hooks that need the provider
@@ -45,24 +43,6 @@ describe('MarginNotesContext', () => {
       expect(() => {
         renderHook(() => useFocus());
       }).toThrow('useMarginNotes must be used within a MarginNotesProvider');
-    });
-  });
-
-  describe('useEditorFocus (backwards compatibility)', () => {
-    it('should throw when used outside provider', () => {
-      // useEditorFocus calls useMarginNotes internally, so the error comes from there
-      expect(() => {
-        renderHook(() => useEditorFocus());
-      }).toThrow('useMarginNotes must be used within a MarginNotesProvider');
-    });
-
-    it('should work inside provider with backwards-compatible API', () => {
-      const { result } = renderHook(() => useEditorFocus(), { wrapper });
-      expect(result.current).toBeDefined();
-      expect(result.current.isMainEditorFocused).toBe(false);
-      expect(result.current.focusedNoteId).toBe(null);
-      expect(result.current.focusedEditor).toBe(null);
-      expect(typeof result.current.setFocusedEditor).toBe('function');
     });
   });
 
@@ -238,120 +218,6 @@ describe('MarginNotesContext', () => {
         result.current.resetFocus();
       });
       expect(result.current.focusState.type).toBe('IDLE');
-    });
-  });
-
-  describe('Legacy API: focusedEditor / setFocusedEditor', () => {
-    it('focusedEditor should be null initially', () => {
-      const { result } = renderHook(() => useMarginNotes(), { wrapper });
-      expect(result.current.focusedEditor).toBe(null);
-    });
-
-    it('focusedEditor should be "main" when main is focused', () => {
-      const { result } = renderHook(() => useMarginNotes(), { wrapper });
-      
-      act(() => {
-        result.current.focusMainEditor();
-      });
-      expect(result.current.focusedEditor).toBe('main');
-    });
-
-    it('focusedEditor should be noteId when note is focused', () => {
-      const { result } = renderHook(() => useMarginNotes(), { wrapper });
-      
-      act(() => {
-        result.current.focusNote('note-xyz');
-      });
-      expect(result.current.focusedEditor).toBe('note-xyz');
-    });
-
-    it('setFocusedEditor("main") should focus main editor', () => {
-      const { result } = renderHook(() => useMarginNotes(), { wrapper });
-      
-      act(() => {
-        result.current.setFocusedEditor('main');
-      });
-      expect(result.current.focusState.type).toBe('MAIN_FOCUSED');
-      expect(result.current.focusedEditor).toBe('main');
-    });
-
-    it('setFocusedEditor(noteId) should focus note', () => {
-      const { result } = renderHook(() => useMarginNotes(), { wrapper });
-      
-      act(() => {
-        result.current.setFocusedEditor('my-note');
-      });
-      expect(result.current.focusState.type).toBe('NOTE_FOCUSED');
-      expect(result.current.focusedEditor).toBe('my-note');
-    });
-
-    it('setFocusedEditor(null) should blur from main', () => {
-      const { result } = renderHook(() => useMarginNotes(), { wrapper });
-      
-      act(() => {
-        result.current.focusMainEditor();
-      });
-      expect(result.current.focusState.type).toBe('MAIN_FOCUSED');
-
-      act(() => {
-        result.current.setFocusedEditor(null);
-      });
-      expect(result.current.focusState.type).toBe('IDLE');
-      expect(result.current.focusedEditor).toBe(null);
-    });
-
-    it('setFocusedEditor(null) should blur from note', () => {
-      const { result } = renderHook(() => useMarginNotes(), { wrapper });
-      
-      act(() => {
-        result.current.focusNote('note-1');
-      });
-      expect(result.current.focusState.type).toBe('NOTE_FOCUSED');
-
-      act(() => {
-        result.current.setFocusedEditor(null);
-      });
-      expect(result.current.focusState.type).toBe('IDLE');
-      expect(result.current.focusedEditor).toBe(null);
-    });
-
-    it('setFocusedEditor(null) from IDLE should be a no-op', () => {
-      const { result } = renderHook(() => useMarginNotes(), { wrapper });
-      expect(result.current.focusState.type).toBe('IDLE');
-
-      act(() => {
-        result.current.setFocusedEditor(null);
-      });
-      expect(result.current.focusState.type).toBe('IDLE');
-    });
-  });
-
-  describe('useEditorFocus backwards compatibility', () => {
-    it('should provide same API as old EditorFocusContext', () => {
-      const { result } = renderHook(() => useEditorFocus(), { wrapper });
-      
-      // Check all required properties exist
-      expect(result.current).toHaveProperty('focusedEditor');
-      expect(result.current).toHaveProperty('setFocusedEditor');
-      expect(result.current).toHaveProperty('isMainEditorFocused');
-      expect(result.current).toHaveProperty('focusedNoteId');
-    });
-
-    it('setFocusedEditor should work via useEditorFocus', () => {
-      const { result } = renderHook(() => useEditorFocus(), { wrapper });
-      
-      act(() => {
-        result.current.setFocusedEditor('main');
-      });
-      expect(result.current.isMainEditorFocused).toBe(true);
-      expect(result.current.focusedEditor).toBe('main');
-
-      act(() => {
-        result.current.setFocusedEditor('note-123');
-      });
-      expect(result.current.isMainEditorFocused).toBe(false);
-      expect(result.current.focusedNoteId).toBe('note-123');
-      expect(result.current.focusedEditor).toBe('note-123');
     });
   });
 

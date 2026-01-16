@@ -1,21 +1,14 @@
 /**
- * EditorFocusContext - Backwards Compatibility Layer
+ * EditorFocusContext - Re-exports from MarginNotesContext
  * 
- * This file is DEPRECATED. Use MarginNotesContext directly for new code.
- * 
- * This re-exports from the new MarginNotesContext to maintain backwards
- * compatibility during the migration period.
- * 
- * @deprecated Use MarginNotesContext instead
+ * All focus management has been moved to the margin-notes module.
+ * This file re-exports the relevant APIs for editor-focused use cases.
  */
 
 export {
-  // The new provider includes all focus functionality
-  MarginNotesProvider as EditorFocusProvider,
-  
-  // Use the backwards-compatible hook
-  useEditorFocus,
-} from '../margin-notes/MarginNotesContext';
-
-// Re-export the type for backwards compatibility
-export type { FocusedEditor } from '../margin-notes/MarginNotesContext';
+  MarginNotesProvider,
+  useMarginNotes,
+  useFocus,
+  type MarginNotesContextType,
+  type MarginNotesProviderProps,
+} from '../margin-notes';

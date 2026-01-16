@@ -1,6 +1,13 @@
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import { Square, Circle, Flower, MarginNote, NoteHighlight } from '@prose/tiptap-extensions';
+import {
+  MainEditorEvent,
+  MainEditorCommand,
+  createBaseMessage,
+} from './protocol';
+
+const DEBUG = process.env.NODE_ENV === 'development';
 
 // Declare the ReactNativeWebView interface for type safety
 declare global {
@@ -13,21 +20,13 @@ declare global {
   }
 }
 
-// Message types for communication with React Native
-type MessageToRN = {
-  type: 'content-change' | 'content-response' | 'editor-ready' | 'selection-change' | 'anchor-positions' | 'margin-note-deleted' | 'editor-focus' | 'editor-blur';
-  payload: any;
-};
-
-type MessageFromRN = {
-  type: 'set-content' | 'get-content' | 'focus' | 'blur' | 'toggle-bold' | 'toggle-italic' | 'insert-square' | 'insert-circle' | 'insert-flower' | 'insert-margin-note' | 'delete-margin-note' | 'get-anchor-positions';
-  payload?: any;
-};
-
-// Send message to React Native
-function sendToRN(message: MessageToRN) {
+// Send typed message to React Native
+function sendToRN(event: MainEditorEvent) {
   if (window.ReactNativeWebView) {
-    window.ReactNativeWebView.postMessage(JSON.stringify(message));
+    if (DEBUG) {
+      console.log('[MainEditor] Sending:', event.type, event.payload);
+    }
+    window.ReactNativeWebView.postMessage(JSON.stringify(event));
   }
 }
 
@@ -41,7 +40,8 @@ function initEditor() {
     content: initialContent,
     onUpdate: ({ editor }) => {
       sendToRN({
-        type: 'content-change',
+        ...createBaseMessage(),
+        type: 'CONTENT_CHANGED',
         payload: {
           html: editor.getHTML(),
           json: editor.getJSON(),
@@ -50,7 +50,8 @@ function initEditor() {
     },
     onSelectionUpdate: ({ editor }) => {
       sendToRN({
-        type: 'selection-change',
+        ...createBaseMessage(),
+        type: 'SELECTION_CHANGED',
         payload: {
           isBold: editor.isActive('bold'),
           isItalic: editor.isActive('italic'),
@@ -65,14 +66,16 @@ function initEditor() {
     onFocus: () => {
       console.log('[MainEditor] onFocus triggered');
       sendToRN({
-        type: 'editor-focus',
+        ...createBaseMessage(),
+        type: 'EDITOR_FOCUS',
         payload: {},
       });
     },
     onBlur: () => {
       console.log('[MainEditor] onBlur triggered');
       sendToRN({
-        type: 'editor-blur',
+        ...createBaseMessage(),
+        type: 'EDITOR_BLUR',
         payload: {},
       });
     },
@@ -156,7 +159,8 @@ function initEditor() {
         editor.commands.deleteMarginNote(id);
         
         sendToRN({
-          type: 'margin-note-deleted',
+          ...createBaseMessage(),
+          type: 'MARGIN_NOTE_DELETED',
           payload: { id },
         });
       }
@@ -164,7 +168,8 @@ function initEditor() {
     previousAnchorIds = currentIds;
 
     sendToRN({
-      type: 'anchor-positions',
+      ...createBaseMessage(),
+      type: 'ANCHORS_CHANGED',
       payload: { positions },
     });
   }
@@ -174,57 +179,62 @@ function initEditor() {
 
   // Handle messages from React Native
   function handleMessage(event: MessageEvent) {
-    let data: MessageFromRN;
+    let data: MainEditorCommand;
     try {
       data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
     } catch {
       return;
     }
 
+    if (DEBUG) {
+      console.log('[MainEditor] Received:', data.type);
+    }
+
     switch (data.type) {
-      case 'set-content':
-        editor.commands.setContent(data.payload);
+      case 'SET_CONTENT':
+        editor.commands.setContent(data.payload.content);
         break;
-      case 'get-content':
+      case 'GET_CONTENT':
         sendToRN({
-          type: 'content-response',
+          ...createBaseMessage(data.correlationId),
+          type: 'CONTENT_RESPONSE',
           payload: {
-            messageId: data.payload?.messageId,  // 返回请求中的 messageId
+            messageId: data.payload.messageId,
             html: editor.getHTML(),
             json: editor.getJSON(),
           },
         });
         break;
-      case 'focus':
+      case 'FOCUS':
         editor.commands.focus();
         break;
-      case 'blur':
+      case 'BLUR':
         editor.commands.blur();
         break;
-      case 'toggle-bold':
+      case 'TOGGLE_BOLD':
         editor.chain().focus().toggleBold().run();
         break;
-      case 'toggle-italic':
+      case 'TOGGLE_ITALIC':
         editor.chain().focus().toggleItalic().run();
         break;
-      case 'insert-square':
+      case 'INSERT_SQUARE':
         editor.chain().focus().insertSquare(data.payload || {}).run();
         break;
-      case 'insert-circle':
+      case 'INSERT_CIRCLE':
         editor.chain().focus().insertCircle(data.payload || {}).run();
         break;
-      case 'insert-flower':
+      case 'INSERT_FLOWER':
         editor.chain().focus().insertFlower(data.payload || {}).run();
         break;
-      case 'insert-margin-note':
+      case 'INSERT_MARGIN_NOTE':
         editor.chain().focus().insertMarginNote(data.payload.id, data.payload.noteIndex).run();
         // Anchor positions will be sent via the 'update' event handler
         break;
-      case 'delete-margin-note':
+      case 'DELETE_MARGIN_NOTE':
         editor.chain().focus().deleteMarginNote(data.payload.id).run();
         // Anchor positions will be sent via the 'update' event handler
         break;
-      case 'get-anchor-positions':
+      case 'GET_ANCHOR_POSITIONS':
         sendAnchorPositions();
         break;
     }
@@ -236,7 +246,8 @@ function initEditor() {
 
   // Notify React Native that editor is ready
   sendToRN({
-    type: 'editor-ready',
+    ...createBaseMessage(),
+    type: 'EDITOR_READY',
     payload: { success: true },
   });
 }

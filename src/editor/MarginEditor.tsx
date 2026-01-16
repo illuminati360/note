@@ -3,8 +3,11 @@ import { WebView, WebViewMessageEvent } from 'react-native-webview';
 import { StyleSheet, View, ViewStyle, Text } from 'react-native';
 import { marginEditorHtml } from './marginEditorHtml';
 import { asyncMessages } from './AsyncMessages';
-import { useEditorFocus } from './EditorFocusContext';
+import { useFocus } from '../margin-notes';
+import { createBaseMessage } from '../protocol/messages';
 import type { EditorState, EditorContent, SquareAttributes, CircleAttributes, FlowerAttributes } from './TipTapEditor';
+
+const DEBUG = __DEV__;
 
 // Ref interface for the margin editor
 export interface MarginEditorRef {
@@ -47,15 +50,22 @@ export const MarginEditor = forwardRef<MarginEditorRef, MarginEditorProps>(
     const webViewRef = useRef<WebView>(null);
     const [isReady, setIsReady] = useState(false);
     const [isEmpty, setIsEmpty] = useState(true);
-    const { focusedEditor, setFocusedEditor } = useEditorFocus();
+    const { focusNote } = useFocus();
     
     // Track if this editor has focus (at the TipTap level)
     const hasFocusRef = useRef(false);
 
-    // Send message to the WebView
-    const sendMessage = useCallback((type: string, payload?: any) => {
+    // Send typed message to the WebView
+    const sendCommand = useCallback((type: string, payload?: any) => {
       if (webViewRef.current) {
-        const message = JSON.stringify({ type, payload });
+        const message = JSON.stringify({
+          ...createBaseMessage(),
+          type,
+          payload,
+        });
+        if (DEBUG) {
+          console.log('[MarginEditor] Sending:', type);
+        }
         webViewRef.current.injectJavaScript(`
           window.postMessage(${JSON.stringify(message)}, '*');
           true;
@@ -67,18 +77,22 @@ export const MarginEditor = forwardRef<MarginEditorRef, MarginEditorProps>(
     const handleMessage = useCallback((event: WebViewMessageEvent) => {
       try {
         const data = JSON.parse(event.nativeEvent.data);
+
+        if (DEBUG) {
+          console.log('[MarginEditor] Received:', data.type);
+        }
         
         switch (data.type) {
-          case 'editor-ready':
+          case 'EDITOR_READY':
             setIsReady(true);
             break;
-          case 'content-change':
+          case 'CONTENT_CHANGED':
             // Check if content is empty
             const html = data.payload?.html || '';
             setIsEmpty(!html || html === '<p></p>' || html.trim() === '');
             onContentChange?.(data.payload);
             break;
-          case 'content-response':
+          case 'CONTENT_RESPONSE':
             if (data.payload?.messageId) {
               asyncMessages.handleResponse(data.payload.messageId, {
                 html: data.payload.html,
@@ -86,79 +100,78 @@ export const MarginEditor = forwardRef<MarginEditorRef, MarginEditorProps>(
               });
             }
             break;
-          case 'selection-change':
+          case 'SELECTION_CHANGED':
             onSelectionChange?.(data.payload);
             break;
-          case 'editor-focus':
+          case 'EDITOR_FOCUS':
             hasFocusRef.current = true;
             onFocus?.();
             break;
-          case 'editor-blur':
+          case 'EDITOR_BLUR':
             hasFocusRef.current = false;
             onBlur?.();
             break;
-          case 'note-block-focus':
+          case 'NOTE_BLOCK_FOCUS':
             const noteId = data.payload?.noteId || null;
             onNoteBlockFocus?.(noteId);
-            // When a note block is focused, update the global focus state
-            // This will override the main editor's focus state
+            // When a note block is focused, update the global focus state via state machine
             if (noteId) {
               hasFocusRef.current = true;
-              setFocusedEditor(noteId);
+              focusNote(noteId);
             }
             break;
-          case 'delete-margin-note':
+          case 'DELETE_MARGIN_NOTE':
             // User clicked badge to delete an empty note - notify parent to delete anchor in main editor
             if (data.payload?.noteId) {
               onDeleteNote?.(data.payload.noteId);
             }
             break;
-          case 'debug-log':
+          case 'DEBUG_LOG':
             console.log(`[WebView] ${data.payload?.tag}`, data.payload?.message);
             break;
         }
       } catch (error) {
         console.warn('Failed to parse message from margin editor:', error);
       }
-    }, [onContentChange, onSelectionChange, onFocus, onBlur, onNoteBlockFocus, onDeleteNote, setFocusedEditor]);
+    }, [onContentChange, onSelectionChange, onFocus, onBlur, onNoteBlockFocus, onDeleteNote, focusNote]);
 
     // Expose methods via ref
     useImperativeHandle(ref, () => ({
       getContent: () => {
         return asyncMessages.sendAsyncMessage<EditorContent>(
-          'get-content',
-          sendMessage,
+          'GET_CONTENT',
+          sendCommand,
           5000
         );
       },
-      setContent: (content: string) => sendMessage('set-content', content),
+      setContent: (content: string) => sendCommand('SET_CONTENT', { content }),
       insertNoteBlock: (noteId: string, noteIndex: number) => {
-        sendMessage('insert-note-block', { noteId, noteIndex });
+        sendCommand('INSERT_NOTE_BLOCK', { noteId, noteIndex });
         setIsEmpty(false);
-        // The WebView will send a 'note-block-focus' event after insertion
+        // The WebView will send a 'NOTE_BLOCK_FOCUS' event after insertion
         // which will set the focusedEditor state
       },
-      deleteNoteBlock: (noteId: string) => sendMessage('delete-note-block', { noteId }),
+      deleteNoteBlock: (noteId: string) => sendCommand('DELETE_NOTE_BLOCK', { noteId }),
       updateNoteBlockIndex: (noteId: string, noteIndex: number) => 
-        sendMessage('update-note-block-index', { noteId, noteIndex }),
+        sendCommand('UPDATE_NOTE_BLOCK_INDEX', { noteId, noteIndex }),
       updateAllNoteBlockIndices: (indices: { noteId: string; noteIndex: number }[]) =>
-        sendMessage('update-all-note-block-indices', { indices }),
-      focus: () => sendMessage('focus'),
-      blur: () => sendMessage('blur'),
-      focusNoteBlock: (noteId: string) => sendMessage('focus-note-block', { noteId }),
-      toggleBold: () => sendMessage('toggle-bold'),
-      toggleItalic: () => sendMessage('toggle-italic'),
-      insertSquare: (attrs?: SquareAttributes) => sendMessage('insert-square', attrs || {}),
-      insertCircle: (attrs?: CircleAttributes) => sendMessage('insert-circle', attrs || {}),
-      insertFlower: (attrs?: FlowerAttributes) => sendMessage('insert-flower', attrs || {}),
-    }), [sendMessage]);
+        sendCommand('UPDATE_ALL_NOTE_BLOCK_INDICES', { indices }),
+      focus: () => sendCommand('FOCUS'),
+      blur: () => sendCommand('BLUR'),
+      focusNoteBlock: (noteId: string) => sendCommand('FOCUS_NOTE_BLOCK', { noteId }),
+      toggleBold: () => sendCommand('TOGGLE_BOLD'),
+      toggleItalic: () => sendCommand('TOGGLE_ITALIC'),
+      insertSquare: (attrs?: SquareAttributes) => sendCommand('INSERT_SQUARE', attrs || {}),
+      insertCircle: (attrs?: CircleAttributes) => sendCommand('INSERT_CIRCLE', attrs || {}),
+      insertFlower: (attrs?: FlowerAttributes) => sendCommand('INSERT_FLOWER', attrs || {}),
+    }), [sendCommand]);
 
     // Inject initial content when ready
     useEffect(() => {
       if (isReady && initialContent) {
-        sendMessage('set-content', initialContent);
+        sendCommand('SET_CONTENT', { content: initialContent });
       }
-    }, [isReady, initialContent, sendMessage]);
+    }, [isReady, initialContent, sendCommand]);
 
     // Inject initial content script before page loads
     const injectedJavaScript = initialContent

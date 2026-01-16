@@ -43,7 +43,6 @@ export {
   MarginNotesProvider,
   useMarginNotes,
   useFocus,
-  useEditorFocus,
   type MarginNotesContextType,
   type MarginNotesProviderProps,
 } from './MarginNotesContext';

@@ -4,10 +4,7 @@ export type { TipTapEditorRef, TipTapEditorProps, EditorState, EditorContent, Ma
 export type { MarginEditorRef, MarginEditorProps } from './MarginEditor';
 export { editorHtml } from './editorHtml';
 
-// Focus context - legacy exports (EditorFocusProvider is now an alias for MarginNotesProvider)
-export { EditorFocusProvider, useEditorFocus, type FocusedEditor } from './EditorFocusContext';
-
-// New margin notes module with state machine (preferred for new code)
+// Focus context (from margin-notes module)
 export {
   MarginNotesProvider,
   useMarginNotes,
