@@ -1,44 +1,21 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+/**
+ * EditorFocusContext - Backwards Compatibility Layer
+ * 
+ * This file is DEPRECATED. Use MarginNotesContext directly for new code.
+ * 
+ * This re-exports from the new MarginNotesContext to maintain backwards
+ * compatibility during the migration period.
+ * 
+ * @deprecated Use MarginNotesContext instead
+ */
 
-// Represents which editor is currently focused
-// 'main' = main editor, string = note ID
-export type FocusedEditor = 'main' | string | null;
+export {
+  // The new provider includes all focus functionality
+  MarginNotesProvider as EditorFocusProvider,
+  
+  // Use the backwards-compatible hook
+  useEditorFocus,
+} from '../margin-notes/MarginNotesContext';
 
-interface EditorFocusContextType {
-  focusedEditor: FocusedEditor;
-  setFocusedEditor: (editor: FocusedEditor) => void;
-  isMainEditorFocused: boolean;
-  focusedNoteId: string | null;
-}
-
-const EditorFocusContext = createContext<EditorFocusContextType | null>(null);
-
-export function EditorFocusProvider({ children }: { children: ReactNode }) {
-  const [focusedEditor, setFocusedEditor] = useState<FocusedEditor>(null);
-
-  const isMainEditorFocused = focusedEditor === 'main';
-  const focusedNoteId = focusedEditor && focusedEditor !== 'main' ? focusedEditor : null;
-
-  return (
-    <EditorFocusContext.Provider
-      value={{
-        focusedEditor,
-        setFocusedEditor,
-        isMainEditorFocused,
-        focusedNoteId,
-      }}
-    >
-      {children}
-    </EditorFocusContext.Provider>
-  );
-}
-
-export function useEditorFocus() {
-  const context = useContext(EditorFocusContext);
-  if (!context) {
-    throw new Error('useEditorFocus must be used within an EditorFocusProvider');
-  }
-  return context;
-}
-
-export default EditorFocusContext;
+// Re-export the type for backwards compatibility
+export type { FocusedEditor } from '../margin-notes/MarginNotesContext';
