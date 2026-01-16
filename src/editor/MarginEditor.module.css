@@ -1,0 +1,92 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  width: 100%;
+  background-color: #fafafa;
+  padding: 4px;
+}
+
+/* Remove all focus outlines from the editor wrapper */
+.wrapper:focus,
+.wrapper:focus-within {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* :global() targets TipTap's generated class names which we can't control */
+.wrapper :global(.tiptap) {
+  flex: 1;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 0 8px 0 32px;
+  min-height: 100%;
+  cursor: text;
+}
+
+.wrapper :global(.tiptap):focus,
+.wrapper :global(.tiptap):focus-within,
+.wrapper :global(.tiptap):focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.wrapper :global(.ProseMirror) {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.wrapper :global(.ProseMirror):focus,
+.wrapper :global(.ProseMirror):focus-within,
+.wrapper :global(.ProseMirror):focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.wrapper :global(.tiptap) p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Margin note block styles - compact */
+.wrapper :global(.margin-note-block) {
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+
+.wrapper :global(.margin-note-block) + :global(.margin-note-block) {
+  margin-top: 8px;
+}
+
+.wrapper :global(.margin-note-badge) {
+  position: absolute;
+  left: -28px;
+  top: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #007AFF;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  cursor: pointer;
+}
+
+.wrapper :global(.margin-note-content) {
+  min-height: 1.2em;
+  padding: 2px 6px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+.wrapper :global(.margin-note-content):focus-within {
+  border-color: #007AFF;
+  box-shadow: none;
+}

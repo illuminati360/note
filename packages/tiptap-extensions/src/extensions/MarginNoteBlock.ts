@@ -94,34 +94,43 @@ export const MarginNoteBlock = Node.create<MarginNoteBlockOptions>({
     return {
       insertMarginNoteBlock:
         (noteId: string, noteIndex: number) =>
-        ({ commands, state }) => {
-          const { doc } = state;
+        ({ state, tr, dispatch }) => {
+          const { doc, schema } = state;
           
-          // Find the correct position to insert based on noteIndex
-          // We want to insert BEFORE the first block with noteIndex > our noteIndex
-          let insertPos = doc.content.size; // Default to end
-          
+          // Collect all existing marginNoteBlocks
+          const existingBlocks: { node: any; pos: number }[] = [];
           doc.descendants((node, pos) => {
             if (node.type.name === this.name) {
-              const existingIndex = node.attrs.noteIndex as number;
-              if (existingIndex >= noteIndex) {
-                // Insert before this node
-                insertPos = pos;
-                return false; // Stop searching
-              }
+              existingBlocks.push({ node, pos });
             }
             return true;
           });
           
-          return commands.insertContentAt(insertPos, {
-            type: this.name,
-            attrs: { noteId, noteIndex },
-            content: [
-              {
-                type: 'paragraph',
-              },
-            ],
-          });
+          // Create the new marginNoteBlock node
+          const marginNoteBlockType = schema.nodes.marginNoteBlock;
+          const paragraphType = schema.nodes.paragraph;
+          const newNode = marginNoteBlockType.create(
+            { noteId, noteIndex },
+            paragraphType.create()
+          );
+          
+          // Build a new document content with all blocks in order
+          const allBlocks = [...existingBlocks.map(b => b.node), newNode];
+          
+          // Sort by noteIndex
+          allBlocks.sort((a, b) => (a.attrs.noteIndex as number) - (b.attrs.noteIndex as number));
+          
+          // Create a new document fragment with only the marginNoteBlocks
+          const newContent = schema.nodes.doc.create(null, allBlocks);
+          
+          // Replace the entire document content
+          tr.replaceWith(0, doc.content.size, newContent.content);
+          
+          if (dispatch) {
+            dispatch(tr);
+          }
+          
+          return true;
         },
 
       deleteMarginNoteBlock:
@@ -260,25 +269,7 @@ export const MarginNoteBlock = Node.create<MarginNoteBlockOptions>({
       badge.classList.add('margin-note-badge');
       badge.textContent = String(node.attrs.noteIndex || 1);
       badge.contentEditable = 'false';
-      
-      // Style the badge
-      badge.style.cssText = `
-        position: absolute;
-        left: -28px;
-        top: 4px;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background-color: #007AFF;
-        color: white;
-        font-size: 11px;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        user-select: none;
-        cursor: pointer;
-      `.replace(/\s+/g, ' ').trim();
+      // Let CSS handle the styling - no inline styles
 
       // Add click handler to badge for deleting empty notes
       badge.addEventListener('click', (e) => {
@@ -320,20 +311,9 @@ export const MarginNoteBlock = Node.create<MarginNoteBlockOptions>({
       // Create content wrapper
       const contentDOM = document.createElement('div');
       contentDOM.classList.add('margin-note-content');
-      contentDOM.style.cssText = `
-        min-height: 1.5em;
-        padding: 4px 8px;
-        background: #fff;
-        border: 1px solid #e0e0e0;
-        border-radius: 6px;
-      `.replace(/\s+/g, ' ').trim();
+      // Let CSS handle the styling - no inline styles
 
-      // Style the container
-      dom.style.cssText = `
-        position: relative;
-        margin: 8px 0 8px 32px;
-        padding-left: 0;
-      `.replace(/\s+/g, ' ').trim();
+      // Let CSS handle the container styling - no inline styles
 
       dom.appendChild(badge);
       dom.appendChild(contentDOM);

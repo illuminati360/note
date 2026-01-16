@@ -1,11 +1,12 @@
 import { useImperativeHandle, forwardRef, useEffect, useRef, useCallback } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { StyleSheet, View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Square, Circle, Flower, MarginNoteBlock } from '@prose/tiptap-extensions';
 import type { EditorState, EditorContent as EditorContentType, SquareAttributes, CircleAttributes, FlowerAttributes } from './TipTapEditor';
 import type { MarginEditorRef, MarginEditorProps } from './MarginEditor';
 import { useFocus } from '../margin-notes';
+import cssStyles from './MarginEditor.module.css';
 
 export const MarginEditor = forwardRef<MarginEditorRef, MarginEditorProps>(
   ({ initialContent, onContentChange, onSelectionChange, onFocus, onBlur, onNoteBlockFocus, onDeleteNote, style }, ref) => {
@@ -230,9 +231,9 @@ export const MarginEditor = forwardRef<MarginEditorRef, MarginEditorProps>(
             <Text style={styles.emptyText}>Margin Notes</Text>
           </View>
         )}
-        <View style={styles.editorWrapper}>
+        <div className={cssStyles.wrapper}>
           <EditorContent editor={editor} />
-        </View>
+        </div>
       </View>
     );
   }
@@ -242,11 +243,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fafafa',
-    padding: 8,
+    padding: 4,
     position: 'relative',
-  },
-  editorWrapper: {
-    flex: 1,
   },
   emptyState: {
     position: 'absolute',
