@@ -1,0 +1,4339 @@
+{
+  "version": "2.6",
+  "children": [
+    {
+      "type": "frame",
+      "id": "P87W5",
+      "x": 0,
+      "y": -37,
+      "name": "Component Library",
+      "theme": {
+        "Style": "Minimal Light"
+      },
+      "width": 800,
+      "fill": "$--background",
+      "layout": "vertical",
+      "gap": 40,
+      "padding": 40,
+      "children": [
+        {
+          "type": "frame",
+          "id": "LIq6e",
+          "name": "header",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 8,
+          "children": [
+            {
+              "type": "text",
+              "id": "IE0uL",
+              "name": "title",
+              "fill": "$--foreground",
+              "content": "Study App Component Library",
+              "fontFamily": "Inter",
+              "fontSize": 32,
+              "fontWeight": "500"
+            },
+            {
+              "type": "text",
+              "id": "wLuEc",
+              "name": "subtitle",
+              "fill": "$--muted-foreground",
+              "content": "Reusable components for your German learning app",
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "AP8hq",
+          "name": "Theme Switcher",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "m0UaV",
+              "name": "themeLabel",
+              "fill": "$--foreground",
+              "content": "Theme Switcher",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "500"
+            },
+            {
+              "type": "frame",
+              "id": "bWznj",
+              "name": "themeRow",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "gpcup",
+                  "name": "Minimal Light Theme",
+                  "context": "Click to switch to Minimal Light theme. Set theme: {Style: 'Minimal Light'}",
+                  "fill": "#FAF8F5",
+                  "cornerRadius": 8,
+                  "stroke": {
+                    "thickness": 2,
+                    "fill": "#1E3A5F"
+                  },
+                  "padding": [
+                    10,
+                    20
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "QbZUc",
+                      "name": "lightLabel",
+                      "fill": "#1E3A5F",
+                      "content": "☀️ Minimal Light",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "0vsoY",
+                  "name": "Minimal Dark Theme",
+                  "context": "Click to switch to Minimal Dark theme. Set theme: {Style: 'Minimal Dark'}",
+                  "fill": "#151517",
+                  "cornerRadius": 8,
+                  "stroke": {
+                    "thickness": 2,
+                    "fill": "#D4A574"
+                  },
+                  "padding": [
+                    10,
+                    20
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "IvvW6",
+                      "name": "darkLabel",
+                      "fill": "#D4A574",
+                      "content": "🌙 Minimal Dark",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "a47Ce",
+          "name": "Buttons",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "zdSTb",
+              "name": "btnLabel",
+              "fill": "$--foreground",
+              "content": "Buttons",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "500"
+            },
+            {
+              "type": "frame",
+              "id": "kkVtV",
+              "name": "btnRow",
+              "width": "fill_container",
+              "gap": 12,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "jVJXc",
+                  "name": "Button/Primary",
+                  "reusable": true,
+                  "fill": "$--primary",
+                  "cornerRadius": 8,
+                  "gap": 8,
+                  "padding": [
+                    10,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "sfrVT",
+                      "name": "btnPrimaryIcon",
+                      "width": 16,
+                      "height": 16,
+                      "iconFontName": "plus",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--primary-foreground"
+                    },
+                    {
+                      "type": "text",
+                      "id": "eyLZx",
+                      "name": "Label",
+                      "fill": "$--primary-foreground",
+                      "content": "Button",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "ytnFN",
+                  "name": "Button/Secondary",
+                  "reusable": true,
+                  "fill": "$--secondary",
+                  "cornerRadius": 8,
+                  "gap": 8,
+                  "padding": [
+                    10,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "zRghN",
+                      "name": "btnSecIcon",
+                      "width": 16,
+                      "height": 16,
+                      "iconFontName": "plus",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--secondary-foreground"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Tlg4e",
+                      "name": "Label",
+                      "fill": "$--secondary-foreground",
+                      "content": "Button",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "kTGWI",
+                  "name": "Button/Outline",
+                  "reusable": true,
+                  "cornerRadius": 8,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$--border"
+                  },
+                  "gap": 8,
+                  "padding": [
+                    10,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "chNQx",
+                      "name": "btnOutIcon",
+                      "width": 16,
+                      "height": 16,
+                      "iconFontName": "plus",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--foreground"
+                    },
+                    {
+                      "type": "text",
+                      "id": "hkR0O",
+                      "name": "Label",
+                      "fill": "$--foreground",
+                      "content": "Button",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "bFbKa",
+                  "name": "Button/Ghost",
+                  "reusable": true,
+                  "cornerRadius": 8,
+                  "gap": 8,
+                  "padding": [
+                    10,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "WIBEf",
+                      "name": "btnGhostIcon",
+                      "width": 16,
+                      "height": 16,
+                      "iconFontName": "plus",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--muted-foreground"
+                    },
+                    {
+                      "type": "text",
+                      "id": "rB7rg",
+                      "name": "Label",
+                      "fill": "$--muted-foreground",
+                      "content": "Button",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Cgey7",
+          "name": "Toolbar Components",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "HILyk",
+              "name": "toolbarLabel",
+              "fill": "$--foreground",
+              "content": "Toolbar Components",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "500"
+            },
+            {
+              "type": "frame",
+              "id": "Ma0SC",
+              "name": "toolbarRow",
+              "width": "fill_container",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "wjblq",
+                  "name": "Toolbar Button",
+                  "reusable": true,
+                  "width": 36,
+                  "height": 36,
+                  "fill": "transparent",
+                  "cornerRadius": 8,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "EuBzi",
+                      "name": "Icon",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "bold",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--foreground"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "a5lC3",
+                  "name": "Toolbar Button/Active",
+                  "reusable": true,
+                  "width": 36,
+                  "height": 36,
+                  "fill": "$--muted",
+                  "cornerRadius": 8,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "SO6Tk",
+                      "name": "Icon",
+                      "width": 18,
+                      "height": 18,
+                      "iconFontName": "bold",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--primary"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "AjlNg",
+          "name": "Margin Note Components",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "vsnoW",
+              "name": "noteLabel",
+              "fill": "$--foreground",
+              "content": "Margin Note Components",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "500"
+            },
+            {
+              "type": "frame",
+              "id": "58EK9",
+              "name": "noteRow",
+              "width": "fill_container",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "b4vHf",
+                  "name": "Note Badge",
+                  "reusable": true,
+                  "width": 20,
+                  "height": 20,
+                  "fill": "$--primary",
+                  "cornerRadius": 10,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "nsWQD",
+                      "name": "Number",
+                      "fill": "$--primary-foreground",
+                      "content": "1",
+                      "textAlign": "center",
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "wJSJG",
+                  "name": "Margin Note Block",
+                  "reusable": true,
+                  "width": 280,
+                  "gap": 8,
+                  "children": [
+                    {
+                      "id": "6SK9m",
+                      "type": "ref",
+                      "ref": "b4vHf",
+                      "name": "noteBlockBadge"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "FlEry",
+                      "name": "Content",
+                      "width": "fill_container",
+                      "fill": "$--card",
+                      "cornerRadius": 8,
+                      "layout": "vertical",
+                      "gap": 4,
+                      "padding": [
+                        4,
+                        8
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "X2DD7",
+                          "name": "Note Text",
+                          "fill": "$--foreground",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "This is a margin note with study content...",
+                          "lineHeight": 1.5,
+                          "fontFamily": "Inter",
+                          "fontSize": 13,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "bYi95",
+                  "name": "Note Anchor",
+                  "reusable": true,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": {
+                      "bottom": 2
+                    },
+                    "fill": "$--note-highlight"
+                  },
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "wTGAJ",
+                      "name": "Anchor Text",
+                      "fill": "$--foreground",
+                      "content": "highlighted text",
+                      "fontFamily": "Inter",
+                      "fontSize": 15,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "ess5l",
+          "name": "Editor Components",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "q67E5",
+              "name": "editorLabel",
+              "fill": "$--foreground",
+              "content": "Editor Components",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "500"
+            },
+            {
+              "type": "frame",
+              "id": "qG5N5",
+              "name": "Toolbar",
+              "reusable": true,
+              "width": "fill_container",
+              "height": 50,
+              "fill": "$--card",
+              "stroke": {
+                "align": "inside",
+                "thickness": {
+                  "bottom": 1
+                },
+                "fill": "$--border"
+              },
+              "gap": 8,
+              "padding": [
+                8,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "id": "srGAG",
+                  "type": "ref",
+                  "ref": "wjblq",
+                  "name": "tbBold",
+                  "descendants": {
+                    "EuBzi": {
+                      "iconFontName": "bold"
+                    }
+                  }
+                },
+                {
+                  "id": "BZ3gT",
+                  "type": "ref",
+                  "ref": "wjblq",
+                  "name": "tbItalic",
+                  "descendants": {
+                    "EuBzi": {
+                      "iconFontName": "italic"
+                    }
+                  }
+                },
+                {
+                  "id": "TT66y",
+                  "type": "ref",
+                  "ref": "wjblq",
+                  "name": "tbStrike",
+                  "descendants": {
+                    "EuBzi": {
+                      "iconFontName": "strikethrough"
+                    }
+                  }
+                },
+                {
+                  "id": "N4IOu",
+                  "type": "ref",
+                  "ref": "wjblq",
+                  "name": "tbCode",
+                  "descendants": {
+                    "EuBzi": {
+                      "iconFontName": "code"
+                    }
+                  }
+                },
+                {
+                  "type": "frame",
+                  "id": "WDDum",
+                  "name": "tbDivider",
+                  "width": 1,
+                  "height": 24,
+                  "fill": "$--border"
+                },
+                {
+                  "id": "BrYXJ",
+                  "type": "ref",
+                  "ref": "jVJXc",
+                  "name": "tbNote",
+                  "descendants": {
+                    "sfrVT": {
+                      "iconFontName": "sticky-note"
+                    },
+                    "eyLZx": {
+                      "content": "Add Note"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "7mo8x",
+          "name": "Shape Icons",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "VggMM",
+              "name": "shapeLabel",
+              "fill": "$--foreground",
+              "content": "Shape Icons (for embedding in text)",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "500"
+            },
+            {
+              "type": "frame",
+              "id": "4kWfH",
+              "name": "shapeRow",
+              "width": "fill_container",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "W2BOs",
+                  "name": "Shape/Square",
+                  "reusable": true,
+                  "width": 24,
+                  "height": 24,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 2,
+                    "fill": "$--primary"
+                  }
+                },
+                {
+                  "type": "ellipse",
+                  "id": "upoXd",
+                  "name": "Shape/Circle",
+                  "reusable": true,
+                  "width": 24,
+                  "height": 24,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 2,
+                    "fill": "$--primary"
+                  }
+                },
+                {
+                  "type": "frame",
+                  "id": "hyu85",
+                  "name": "Shape/Flower",
+                  "reusable": true,
+                  "width": 24,
+                  "height": 24,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "rR5Wf",
+                      "name": "flowerInner",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "flower-2",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--primary"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "o7miu",
+          "name": "Input Components",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "vQpLg",
+              "name": "inputLabel",
+              "fill": "$--foreground",
+              "content": "Input Components",
+              "fontFamily": "Inter",
+              "fontSize": 18,
+              "fontWeight": "500"
+            },
+            {
+              "type": "frame",
+              "id": "YiYBO",
+              "name": "inputRow",
+              "width": "fill_container",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "OiNh7",
+                  "name": "Input Group",
+                  "reusable": true,
+                  "width": 280,
+                  "layout": "vertical",
+                  "gap": 6,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "gYH8B",
+                      "name": "Label",
+                      "fill": "$--foreground",
+                      "content": "Label",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "wsW7Y",
+                      "name": "Input Field",
+                      "width": "fill_container",
+                      "height": 40,
+                      "fill": "$--card",
+                      "cornerRadius": 8,
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": 1,
+                        "fill": "$--border"
+                      },
+                      "gap": 8,
+                      "padding": [
+                        8,
+                        16
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "P2kxb",
+                          "name": "Placeholder",
+                          "fill": "$--muted-foreground",
+                          "content": "Enter text...",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "Lf82i",
+      "x": 0,
+      "y": 2143,
+      "name": "Word Net (Desktop 1280×800)",
+      "context": "SOURCE OF TRUTH: Canonical design for Word Net page. Mobile is derivative.",
+      "theme": {
+        "Style": "Minimal Light"
+      },
+      "width": 1280,
+      "height": 800,
+      "fill": "$--background",
+      "children": [
+        {
+          "type": "frame",
+          "id": "elXs3",
+          "name": "Word Info Pane",
+          "width": 640,
+          "height": "fill_container",
+          "fill": "$--background",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": 32,
+          "children": [
+            {
+              "type": "text",
+              "id": "mD1Ul",
+              "name": "Lemma Title",
+              "fill": "$--foreground",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "vorbereiten",
+              "fontFamily": "Inter",
+              "fontSize": 48,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "CgLsb",
+              "name": "Form Section",
+              "width": "fill_container",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "PpZp6",
+                  "name": "Speaker Button",
+                  "context": "Implementation: Play audio pronunciation of the word when clicked.",
+                  "fill": "$--primary",
+                  "content": "🔊",
+                  "fontFamily": "Inter",
+                  "fontSize": 24,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "BBeox",
+                  "name": "Form with Stress",
+                  "context": "The stressed syllable 'vor' has an underline decoration.",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "TMKoD",
+                      "name": "Stressed Syllable",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "4tpdH",
+                          "name": "stressedText",
+                          "fill": "$--foreground",
+                          "content": "vor",
+                          "fontFamily": "Inter",
+                          "fontSize": 28,
+                          "fontWeight": "medium"
+                        },
+                        {
+                          "type": "rectangle",
+                          "id": "K01wC",
+                          "name": "Stress Underline",
+                          "fill": "$--foreground",
+                          "width": 40,
+                          "height": 2
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "NkIU3",
+                      "name": "midDot",
+                      "fill": "$--foreground",
+                      "content": "・",
+                      "fontFamily": "Inter",
+                      "fontSize": 28,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "zDReT",
+                      "name": "restText",
+                      "fill": "$--foreground",
+                      "content": "bereiten",
+                      "fontFamily": "Inter",
+                      "fontSize": 28,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "XwDUZ",
+              "name": "Grammar Section",
+              "width": "fill_container",
+              "gap": 12,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "DrH7a",
+                  "name": "Grammar Tag",
+                  "fill": "$--primary",
+                  "content": "G",
+                  "fontFamily": "Inter",
+                  "fontSize": 24,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "0cV4T",
+                  "name": "Grammar Forms",
+                  "fill": "$--foreground",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "bereitete vor, hat vorbereitet",
+                  "fontFamily": "Inter",
+                  "fontSize": 20,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "93gwI",
+              "name": "Divider",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "$--border"
+            },
+            {
+              "type": "frame",
+              "id": "JkxGt",
+              "name": "Senses Section",
+              "context": "Implementation: Paginated list of senses. Show one sense at a time with prev/next navigation or swipe gesture.",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "YvdgH",
+                  "name": "Senses Header Row",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "TIcS4",
+                      "name": "Senses Tag",
+                      "fill": "$--primary",
+                      "content": "S",
+                      "fontFamily": "Inter",
+                      "fontSize": 24,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "9Ps8F",
+                      "name": "Pagination Dots",
+                      "width": "fill_container",
+                      "gap": 8,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "ellipse",
+                          "id": "l8DZ3",
+                          "name": "Dot Active",
+                          "fill": "$--primary",
+                          "width": 10,
+                          "height": 10
+                        },
+                        {
+                          "type": "ellipse",
+                          "id": "tetSF",
+                          "name": "Dot",
+                          "width": 10,
+                          "height": 10,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "$--primary"
+                          }
+                        },
+                        {
+                          "type": "ellipse",
+                          "id": "qzne2",
+                          "name": "Dot",
+                          "width": 10,
+                          "height": 10,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "$--primary"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Bya43",
+                  "name": "Sense Header",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "N2Xmz",
+                      "name": "Sense Number",
+                      "fill": "$--foreground",
+                      "content": "(1)",
+                      "fontFamily": "Inter",
+                      "fontSize": 24,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "LSVOs",
+                      "name": "Sense Definition",
+                      "fill": "$--text-secondary",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "etwas, jemanden oder sich selbst einer Voraussicht oder Zukunftserwartung anpassen; so ändern ...",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Y2mPD",
+                  "name": "Examples Container",
+                  "context": "Implementation: List of example sentences. Each has a favorite button and can be removed. User can add custom examples.",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": [
+                    0,
+                    0,
+                    0,
+                    36
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "pWt9h",
+                      "name": "Example Row",
+                      "width": "fill_container",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "keV67",
+                          "name": "Favorite Button",
+                          "context": "Implementation: Toggle to remove/unfavorite this example",
+                          "fill": "$--muted-foreground",
+                          "content": "−",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Lbw45",
+                          "name": "Example Text",
+                          "fill": "$--foreground",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Das Team bereitet derzeit eine Veröffentlichung in einem Fachmagazin vor.",
+                          "fontFamily": "Inter",
+                          "fontSize": 16,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "sLLP4",
+                          "name": "Add to Favorites",
+                          "context": "Implementation: Add this example to favorites/saved examples",
+                          "fill": "$--primary",
+                          "content": "+",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "oSoTX",
+                      "name": "Example Row 2",
+                      "width": "fill_container",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ziJXV",
+                          "name": "ex2Fav",
+                          "fill": "$--muted-foreground",
+                          "content": "−",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "RhHFe",
+                          "name": "ex2Text",
+                          "fill": "$--foreground",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Ich muss mich noch auf die morgige Prüfung vorbereiten.",
+                          "fontFamily": "Inter",
+                          "fontSize": 16,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "P3xbo",
+                          "name": "ex2Add",
+                          "fill": "$--primary",
+                          "content": "+",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "4ey0T",
+                      "name": "Example Row 3",
+                      "width": "fill_container",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "jOfvZ",
+                          "name": "ex3Fav",
+                          "fill": "$--muted-foreground",
+                          "content": "−",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "REeRT",
+                          "name": "ex3Text",
+                          "fill": "$--foreground",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Wir haben das Haus auf den kommenden Sturm bereits vorbereitet.",
+                          "fontFamily": "Inter",
+                          "fontSize": 16,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "6LGZb",
+                          "name": "ex3Add",
+                          "fill": "$--primary",
+                          "content": "+",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "TudbB",
+                      "name": "Add Example Button",
+                      "context": "Implementation: Opens input to add a custom example sentence",
+                      "cornerRadius": 8,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "$--primary"
+                      },
+                      "gap": 8,
+                      "padding": [
+                        8,
+                        16
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "8QxzS",
+                          "name": "addExIcon",
+                          "fill": "$--primary",
+                          "content": "+",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "Z4Tid",
+                          "name": "addExLabel",
+                          "fill": "$--primary",
+                          "content": "Add custom example",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "bPdT4",
+          "name": "Word Net Graph Pane",
+          "clip": true,
+          "width": 640,
+          "height": "fill_container",
+          "fill": "$--muted",
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "wuYL3",
+              "name": "Graph Toolbar",
+              "context": "Implementation: Toolbar for Word Net graph controls - zoom, fit, and node manipulation",
+              "width": "fill_container",
+              "height": 48,
+              "fill": "$--border",
+              "gap": 8,
+              "padding": [
+                8,
+                16
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "n2inG",
+                  "name": "Left Controls",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "OIiSN",
+                      "name": "Zoom In",
+                      "width": 32,
+                      "height": 32,
+                      "fill": "$--background",
+                      "cornerRadius": 4,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "tT3ug",
+                          "name": "zoomInIcon",
+                          "fill": "$--foreground",
+                          "content": "+",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "0u8Nh",
+                      "name": "Zoom Slider",
+                      "context": "Implementation: Horizontal slider for zoom level. Thumb position indicates current zoom.",
+                      "width": 80,
+                      "height": 4,
+                      "fill": "$--border",
+                      "cornerRadius": 2,
+                      "layout": "none",
+                      "children": [
+                        {
+                          "type": "ellipse",
+                          "id": "fs9LA",
+                          "x": 34,
+                          "y": -4,
+                          "name": "Slider Thumb",
+                          "fill": "$--primary",
+                          "width": 12,
+                          "height": 12
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "6qxCN",
+                      "name": "Zoom Out",
+                      "width": 32,
+                      "height": 32,
+                      "fill": "$--background",
+                      "cornerRadius": 4,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "4PfO2",
+                          "name": "zoomOutIcon",
+                          "fill": "$--foreground",
+                          "content": "−",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "cU0FU",
+                      "name": "Fit to View",
+                      "context": "Implementation: Fit entire graph into visible viewport",
+                      "width": 32,
+                      "height": 32,
+                      "fill": "$--background",
+                      "cornerRadius": 4,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "c0eUm",
+                          "name": "fitIcon",
+                          "fill": "$--foreground",
+                          "content": "⛶",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Rniz0",
+                  "name": "Right Controls",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "y6WaE",
+                      "name": "Delete Node",
+                      "context": "Implementation: Delete the currently selected node from the graph",
+                      "width": 32,
+                      "height": 32,
+                      "fill": "$--background",
+                      "cornerRadius": 4,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "pGpku",
+                          "name": "deleteIcon",
+                          "fill": "$--foreground",
+                          "content": "🗑",
+                          "fontFamily": "Inter",
+                          "fontSize": 16,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "HUw8t",
+                      "name": "Expand Node",
+                      "context": "Implementation: Expand the selected node to show more connections",
+                      "width": 32,
+                      "height": 32,
+                      "fill": "$--background",
+                      "cornerRadius": 4,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "EqQdI",
+                          "name": "expandIcon",
+                          "fill": "$--foreground",
+                          "content": "⊕",
+                          "fontFamily": "Inter",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "v3rrI",
+              "name": "Graph Canvas",
+              "context": "Implementation: Force-directed graph layout using d3-force or react-force-graph. Nodes are draggable. SHAPES: Circles = verbs (gray for related, green for center), Squares = nouns (yellow fill). CONNECTIONS: Render programmatically as SVG lines or bezier curves between node centers. Line style indicates relationship type (solid=synonym, dashed=related). Pan/zoom gestures supported.",
+              "clip": true,
+              "width": "fill_container",
+              "height": "fill_container",
+              "fill": "$--muted",
+              "layout": "none",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "8ciOl",
+                  "x": 250,
+                  "y": 250,
+                  "name": "Center Node Group",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "u8U0A",
+                      "name": "Center Circle",
+                      "context": "Implementation: Main word node. Green filled circle indicates the focused/current word.",
+                      "fill": "$--primary",
+                      "width": 50,
+                      "height": 50
+                    },
+                    {
+                      "type": "text",
+                      "id": "svf9h",
+                      "name": "centerLabel",
+                      "fill": "$--foreground",
+                      "content": "vorbereiten",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "M0Q7e",
+                  "x": 120,
+                  "y": 140,
+                  "name": "Related Node Group",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "dMyOy",
+                      "name": "circle1",
+                      "context": "Implementation: Related word nodes. Gray circles. On click, navigate to that word.",
+                      "fill": "$--muted-foreground",
+                      "width": 40,
+                      "height": 40
+                    },
+                    {
+                      "type": "text",
+                      "id": "QUIA3",
+                      "name": "label1",
+                      "fill": "$--foreground",
+                      "content": "bereiten",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "LWd3U",
+                  "x": 380,
+                  "y": 160,
+                  "name": "Related Node Group",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 4,
+                      "id": "83KRO",
+                      "name": "nounSquare",
+                      "context": "Yellow square = noun. Vorbereitung is a feminine noun (die Vorbereitung).",
+                      "fill": "#FFFDE7",
+                      "width": 40,
+                      "height": 40,
+                      "stroke": {
+                        "thickness": 2,
+                        "fill": "$--foreground"
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "id": "Lh5ut",
+                      "name": "label2",
+                      "fill": "$--foreground",
+                      "content": "Vorbereitung",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "Y7YtZ",
+                  "x": 140,
+                  "y": 360,
+                  "name": "Related Node Group",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "i2vJ8",
+                      "name": "circle3",
+                      "fill": "$--muted-foreground",
+                      "width": 40,
+                      "height": 40
+                    },
+                    {
+                      "type": "text",
+                      "id": "cAh3v",
+                      "name": "label3",
+                      "fill": "$--foreground",
+                      "content": "fertig",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "dDsZw",
+                  "x": 360,
+                  "y": 340,
+                  "name": "Related Node Group",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "aJs2G",
+                      "name": "circle4",
+                      "fill": "$--muted-foreground",
+                      "width": 40,
+                      "height": 40
+                    },
+                    {
+                      "type": "text",
+                      "id": "nHn0e",
+                      "name": "label4",
+                      "fill": "$--foreground",
+                      "content": "planen",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "2lJXo",
+                  "x": 10,
+                  "y": 10,
+                  "name": "Connection Lines Note",
+                  "width": 180,
+                  "height": 50,
+                  "fill": "$--accent",
+                  "cornerRadius": 4,
+                  "padding": 8,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "RjZHS",
+                      "name": "connNoteText",
+                      "fill": "$--text-secondary",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "⚠️ Connection lines rendered programmatically. Circles=verbs, Squares=nouns",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "eTjGv",
+                  "x": 400,
+                  "y": 90,
+                  "name": "Related Node Group",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "QjqZF",
+                      "name": "rustenCircle",
+                      "context": "Gray circle = verb. rüsten (to arm, to prepare).",
+                      "fill": "$--muted-foreground",
+                      "width": 40,
+                      "height": 40
+                    },
+                    {
+                      "type": "text",
+                      "id": "grpH7",
+                      "name": "rustenLabel",
+                      "fill": "$--foreground",
+                      "content": "rüsten",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "iVQm9",
+      "x": 0,
+      "y": 1213,
+      "name": "Note Editor (DESKTOP 1280x800)",
+      "theme": {
+        "Style": "Minimal Light"
+      },
+      "layout": "vertical",
+      "gap": 16,
+      "children": [
+        {
+          "type": "frame",
+          "id": "cJFNj",
+          "name": "Responsive Views",
+          "gap": 60,
+          "children": [
+            {
+              "type": "frame",
+              "id": "mPRTT",
+              "name": "desktopLabel",
+              "layout": "vertical",
+              "gap": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "e4Qya",
+                  "name": "Note Editor (Desktop 1280×800)",
+                  "context": "SOURCE OF TRUTH: Canonical design for Note Editor. Mobile is derivative.",
+                  "clip": true,
+                  "width": 1280,
+                  "height": 800,
+                  "fill": "$--background",
+                  "layout": "vertical",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "aT78y",
+                      "name": "Toolbar",
+                      "width": "fill_container",
+                      "height": 50,
+                      "fill": "$--card",
+                      "gap": 8,
+                      "padding": [
+                        8,
+                        16
+                      ],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "BkG2X",
+                          "name": "Format Buttons",
+                          "context": "Implementation: Shape icons (sqBtn, cirBtn, flBtn) use primitives/unicode as placeholders. Replace with actual SVG icons from packages/tiptap-extensions/src/svg/",
+                          "gap": 4,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "wyBGS",
+                              "name": "boldBtn",
+                              "width": 34,
+                              "height": 34,
+                              "fill": "transparent",
+                              "cornerRadius": 6,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "9WcmC",
+                                  "name": "boldIcon",
+                                  "fill": "$--foreground",
+                                  "content": "B",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "700"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "Vy8iA",
+                              "name": "italicBtn",
+                              "width": 34,
+                              "height": 34,
+                              "fill": "transparent",
+                              "cornerRadius": 6,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "jyHhO",
+                                  "name": "italicIcon",
+                                  "fill": "$--foreground",
+                                  "content": "I",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal",
+                                  "fontStyle": "italic"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "rectangle",
+                              "id": "KqvQq",
+                              "name": "div",
+                              "fill": "$--border",
+                              "width": 1,
+                              "height": 20
+                            },
+                            {
+                              "type": "frame",
+                              "id": "5jmZr",
+                              "name": "sqBtn",
+                              "context": "Implementation: Replace with SVG icon - square shape insert button. See packages/tiptap-extensions/src/svg/square.ts",
+                              "width": 34,
+                              "height": 34,
+                              "fill": "transparent",
+                              "cornerRadius": 6,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "rectangle",
+                                  "id": "OElTi",
+                                  "name": "sqIcon",
+                                  "fill": "none",
+                                  "width": 14,
+                                  "height": 14,
+                                  "stroke": {
+                                    "thickness": 1.5,
+                                    "fill": "$--foreground"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "1fexi",
+                              "name": "cirBtn",
+                              "context": "Implementation: Replace with SVG icon - circle shape insert button. See packages/tiptap-extensions/src/svg/circle.ts",
+                              "width": 34,
+                              "height": 34,
+                              "fill": "transparent",
+                              "cornerRadius": 6,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "ellipse",
+                                  "id": "wcDMN",
+                                  "name": "cirIcon",
+                                  "fill": "none",
+                                  "width": 14,
+                                  "height": 14,
+                                  "stroke": {
+                                    "thickness": 1.5,
+                                    "fill": "$--foreground"
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "OYydQ",
+                              "name": "flBtn",
+                              "context": "Implementation: Replace with SVG icon - flower shape insert button. See packages/tiptap-extensions/src/svg/flower.ts. The ✿ unicode is a placeholder.",
+                              "width": 34,
+                              "height": 34,
+                              "fill": "$--muted",
+                              "cornerRadius": 6,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "nlAoz",
+                                  "name": "flIcon",
+                                  "fill": "$--primary",
+                                  "content": "✿",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "XrRtU",
+                          "name": "tbRight",
+                          "gap": 8,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "wmI02",
+                              "name": "noteBtn",
+                              "height": 34,
+                              "fill": "$--primary",
+                              "cornerRadius": 8,
+                              "gap": 6,
+                              "padding": [
+                                0,
+                                12
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "5i5UQ",
+                                  "name": "notePlus",
+                                  "fill": "$--primary-foreground",
+                                  "content": "+",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 14,
+                                  "fontWeight": "600"
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "jCUQI",
+                                  "name": "noteLabel",
+                                  "fill": "$--primary-foreground",
+                                  "content": "Add Note",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 13,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "309bv",
+                      "name": "Main Area",
+                      "context": "Responsive: On mobile (<768px), switch to layout:vertical so margin notes stack below editor",
+                      "width": "fill_container",
+                      "height": "fill_container",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "zThrQ",
+                          "name": "Editor Pane",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "fill": "$--background",
+                          "layout": "vertical",
+                          "padding": [
+                            40,
+                            60
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "ebJoi",
+                              "name": "editorTitle",
+                              "fill": "$--foreground",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "German Vocabulary — Week 3",
+                              "fontFamily": "Inter",
+                              "fontSize": 24,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "PaDRT",
+                              "name": "Editor Body",
+                              "width": "fill_container",
+                              "layout": "vertical",
+                              "gap": 16,
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "1Ztuo",
+                                  "name": "Video Player",
+                                  "context": "Implementation: Video player at top. Text below acts as transcript - highlight current sentence as video plays.",
+                                  "width": "fill_container",
+                                  "layout": "vertical",
+                                  "gap": 12,
+                                  "children": [
+                                    {
+                                      "type": "frame",
+                                      "id": "ZW6Sp",
+                                      "name": "videoContainer",
+                                      "context": "Implementation: Replace with actual video player (react-native-video or iframe for web)",
+                                      "width": "fill_container",
+                                      "height": 280,
+                                      "fill": "#1A1A1A",
+                                      "cornerRadius": 8,
+                                      "justifyContent": "center",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "frame",
+                                          "id": "YzH3L",
+                                          "name": "playBtn",
+                                          "width": 60,
+                                          "height": 60,
+                                          "fill": "#FFFFFF33",
+                                          "cornerRadius": 30,
+                                          "justifyContent": "center",
+                                          "alignItems": "center",
+                                          "children": [
+                                            {
+                                              "type": "text",
+                                              "id": "pxeQW",
+                                              "name": "playIcon",
+                                              "fill": "#FFFFFF",
+                                              "content": "▶",
+                                              "fontFamily": "Inter",
+                                              "fontSize": 24,
+                                              "fontWeight": "normal"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "taQM1",
+                                      "name": "controlsBar",
+                                      "width": "fill_container",
+                                      "height": 36,
+                                      "gap": 12,
+                                      "padding": [
+                                        0,
+                                        8
+                                      ],
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "ST5eE",
+                                          "name": "currentTime",
+                                          "fill": "$--text-secondary",
+                                          "content": "0:00",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 12,
+                                          "fontWeight": "500"
+                                        },
+                                        {
+                                          "type": "frame",
+                                          "id": "eAxf9",
+                                          "name": "progressBar",
+                                          "width": "fill_container",
+                                          "height": 4,
+                                          "fill": "$--border",
+                                          "cornerRadius": 2,
+                                          "children": [
+                                            {
+                                              "type": "frame",
+                                              "id": "qDeZf",
+                                              "name": "progressFill",
+                                              "width": 80,
+                                              "height": 4,
+                                              "fill": "$--primary",
+                                              "cornerRadius": 2
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "type": "text",
+                                          "id": "vBD7B",
+                                          "name": "duration",
+                                          "fill": "$--text-secondary",
+                                          "content": "3:24",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 12,
+                                          "fontWeight": "500"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "7wV6C",
+                                  "name": "para1",
+                                  "context": "Implementation: This text is the transcript. Highlight sentences as they are spoken in the video.",
+                                  "fill": "$--foreground",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Today I learned several new words related to nature and the outdoors. Die Blume (flower) is feminine, and der Baum (tree) is masculine.",
+                                  "lineHeight": 1.7,
+                                  "fontFamily": "Inter",
+                                  "fontSize": 15,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "GfsiE",
+                                  "name": "Para 2",
+                                  "context": "Implementation: Use flex-wrap: wrap in CSS to allow inline content to flow to next line on narrow screens",
+                                  "width": "fill_container",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "V0sHw",
+                                      "name": "text2a",
+                                      "fill": "$--foreground",
+                                      "content": "The weather vocabulary includes ",
+                                      "lineHeight": 1.7,
+                                      "fontFamily": "Inter",
+                                      "fontSize": 15,
+                                      "fontWeight": "normal"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "chyIS",
+                                      "name": "hl1",
+                                      "fill": "$--note-highlight",
+                                      "cornerRadius": 2,
+                                      "padding": [
+                                        2,
+                                        0
+                                      ],
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "VxScZ",
+                                          "name": "hl1Text",
+                                          "fill": "$--foreground",
+                                          "content": "der Regen",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 15,
+                                          "fontWeight": "500"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "amvDG",
+                                      "name": "badge1",
+                                      "width": 14,
+                                      "height": 14,
+                                      "fill": "$--primary",
+                                      "cornerRadius": 7,
+                                      "justifyContent": "center",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "yoEFn",
+                                          "name": "badge1Num",
+                                          "fill": "$--primary-foreground",
+                                          "content": "1",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 8,
+                                          "fontWeight": "600"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "9qcWZ",
+                                      "name": "text2b",
+                                      "fill": "$--foreground",
+                                      "content": " (rain) and die Sonne (sun).",
+                                      "lineHeight": 1.7,
+                                      "fontFamily": "Inter",
+                                      "fontSize": 15,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "frame",
+                                  "id": "1OCBg",
+                                  "name": "Para 3",
+                                  "context": "Implementation: Use flex-wrap: wrap in CSS to allow inline content to flow to next line on narrow screens",
+                                  "width": "fill_container",
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "JfpSA",
+                                      "name": "text3a",
+                                      "fill": "$--foreground",
+                                      "content": "I need to practice ",
+                                      "lineHeight": 1.7,
+                                      "fontFamily": "Inter",
+                                      "fontSize": 15,
+                                      "fontWeight": "normal"
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "h02Fa",
+                                      "name": "hl2",
+                                      "fill": "$--note-highlight",
+                                      "cornerRadius": 2,
+                                      "padding": [
+                                        2,
+                                        0
+                                      ],
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "C0xiP",
+                                          "name": "hl2Text",
+                                          "fill": "$--foreground",
+                                          "content": "die Jahreszeiten",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 15,
+                                          "fontWeight": "500"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "frame",
+                                      "id": "TaKkz",
+                                      "name": "badge2",
+                                      "width": 14,
+                                      "height": 14,
+                                      "fill": "$--primary",
+                                      "cornerRadius": 7,
+                                      "justifyContent": "center",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "b6e7K",
+                                          "name": "badge2Num",
+                                          "fill": "$--primary-foreground",
+                                          "content": "2",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 8,
+                                          "fontWeight": "600"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "MHJCr",
+                                      "name": "text3b",
+                                      "fill": "$--foreground",
+                                      "content": " (the seasons) vocabulary more.",
+                                      "lineHeight": 1.7,
+                                      "fontFamily": "Inter",
+                                      "fontSize": 15,
+                                      "fontWeight": "normal"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "IQg1h",
+                          "name": "Margin Notes Panel",
+                          "context": "Mobile: width becomes fill_container, stacks below editor",
+                          "width": 280,
+                          "height": "fill_container",
+                          "fill": "$--margin-panel",
+                          "layout": "vertical",
+                          "gap": 12,
+                          "padding": 16,
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "yNXR0",
+                              "name": "marginHeader",
+                              "fill": "$--muted-foreground",
+                              "content": "NOTES",
+                              "fontFamily": "Inter",
+                              "fontSize": 11,
+                              "fontWeight": "600",
+                              "letterSpacing": 1
+                            },
+                            {
+                              "type": "frame",
+                              "id": "piFjs",
+                              "name": "Note Card 1",
+                              "width": "fill_container",
+                              "fill": "$--card",
+                              "cornerRadius": 8,
+                              "layout": "vertical",
+                              "gap": 4,
+                              "padding": 10,
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "Uwlwq",
+                                  "name": "note1Header",
+                                  "width": "fill_container",
+                                  "gap": 8,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "frame",
+                                      "id": "7NCuI",
+                                      "name": "note1Badge",
+                                      "width": 20,
+                                      "height": 20,
+                                      "fill": "$--primary",
+                                      "cornerRadius": 10,
+                                      "justifyContent": "center",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "UFz8M",
+                                          "name": "note1BadgeNum",
+                                          "fill": "$--primary-foreground",
+                                          "content": "1",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 10,
+                                          "fontWeight": "600"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "f26Yd",
+                                      "name": "note1Title",
+                                      "fill": "$--foreground",
+                                      "content": "der Regen",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 12,
+                                      "fontWeight": "600"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "xIFOE",
+                                  "name": "note1Content",
+                                  "fill": "$--text-secondary",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Masculine noun. Remember: weather phenomena are often masculine in German.",
+                                  "lineHeight": 1.4,
+                                  "fontFamily": "Inter",
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "cBCe2",
+                              "name": "Note Card 2",
+                              "width": "fill_container",
+                              "fill": "$--card",
+                              "cornerRadius": 8,
+                              "layout": "vertical",
+                              "gap": 4,
+                              "padding": 10,
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "CNQ4B",
+                                  "name": "note2Header",
+                                  "width": "fill_container",
+                                  "gap": 8,
+                                  "alignItems": "center",
+                                  "children": [
+                                    {
+                                      "type": "frame",
+                                      "id": "mPXFx",
+                                      "name": "note2Badge",
+                                      "width": 20,
+                                      "height": 20,
+                                      "fill": "$--primary",
+                                      "cornerRadius": 10,
+                                      "justifyContent": "center",
+                                      "alignItems": "center",
+                                      "children": [
+                                        {
+                                          "type": "text",
+                                          "id": "JSrBt",
+                                          "name": "note2BadgeNum",
+                                          "fill": "$--primary-foreground",
+                                          "content": "2",
+                                          "fontFamily": "Inter",
+                                          "fontSize": 10,
+                                          "fontWeight": "600"
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "type": "text",
+                                      "id": "I7SFL",
+                                      "name": "note2Title",
+                                      "fill": "$--foreground",
+                                      "content": "die Jahreszeiten",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 12,
+                                      "fontWeight": "600"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "gn9tQ",
+                                  "name": "note2Content",
+                                  "fill": "$--text-secondary",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Feminine plural. Spring=Frühling, Summer=Sommer, Fall=Herbst, Winter=Winter",
+                                  "lineHeight": 1.4,
+                                  "fontFamily": "Inter",
+                                  "fontSize": 11,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "LxIyK",
+      "x": 1351,
+      "y": 1213,
+      "name": "Note Editor (Mobile 360×800)",
+      "context": "DERIVATIVE: Regenerate from Desktop source of truth after changes.",
+      "theme": {
+        "Style": "Minimal Light"
+      },
+      "clip": true,
+      "width": 360,
+      "height": 800,
+      "fill": "$--background",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "lwsY9",
+          "name": "Toolbar",
+          "width": "fill_container",
+          "height": 50,
+          "fill": "$--card",
+          "gap": 8,
+          "padding": [
+            8,
+            16
+          ],
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "XAvmj",
+              "name": "Format Buttons",
+              "context": "Implementation: Shape icons (sqBtn, cirBtn, flBtn) use primitives/unicode as placeholders. Replace with actual SVG icons from packages/tiptap-extensions/src/svg/",
+              "gap": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "iokow",
+                  "name": "boldBtn",
+                  "width": 34,
+                  "height": 34,
+                  "fill": "transparent",
+                  "cornerRadius": 6,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "qDoaS",
+                      "name": "boldIcon",
+                      "fill": "$--foreground",
+                      "content": "B",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "700"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "jj371",
+                  "name": "italicBtn",
+                  "width": 34,
+                  "height": 34,
+                  "fill": "transparent",
+                  "cornerRadius": 6,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "GJ6LI",
+                      "name": "italicIcon",
+                      "fill": "$--foreground",
+                      "content": "I",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal",
+                      "fontStyle": "italic"
+                    }
+                  ]
+                },
+                {
+                  "type": "rectangle",
+                  "id": "xB7KB",
+                  "name": "div",
+                  "fill": "$--border",
+                  "width": 1,
+                  "height": 20
+                },
+                {
+                  "type": "frame",
+                  "id": "V9mlJ",
+                  "name": "sqBtn",
+                  "context": "Implementation: Replace with SVG icon - square shape insert button. See packages/tiptap-extensions/src/svg/square.ts",
+                  "width": 34,
+                  "height": 34,
+                  "fill": "transparent",
+                  "cornerRadius": 6,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "id": "Vf1xY",
+                      "name": "sqIcon",
+                      "fill": "none",
+                      "width": 14,
+                      "height": 14,
+                      "stroke": {
+                        "thickness": 1.5,
+                        "fill": "$--foreground"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "qrLxz",
+                  "name": "cirBtn",
+                  "context": "Implementation: Replace with SVG icon - circle shape insert button. See packages/tiptap-extensions/src/svg/circle.ts",
+                  "width": 34,
+                  "height": 34,
+                  "fill": "transparent",
+                  "cornerRadius": 6,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "n4C3S",
+                      "name": "cirIcon",
+                      "fill": "none",
+                      "width": 14,
+                      "height": 14,
+                      "stroke": {
+                        "thickness": 1.5,
+                        "fill": "$--foreground"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "KHZi3",
+                  "name": "flBtn",
+                  "context": "Implementation: Replace with SVG icon - flower shape insert button. See packages/tiptap-extensions/src/svg/flower.ts. The ✿ unicode is a placeholder.",
+                  "width": 34,
+                  "height": 34,
+                  "fill": "$--muted",
+                  "cornerRadius": 6,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "aTNYU",
+                      "name": "flIcon",
+                      "fill": "$--primary",
+                      "content": "✿",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "f5ns8",
+              "name": "tbRight",
+              "gap": 8,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "CHzF1",
+                  "name": "noteBtn",
+                  "height": 34,
+                  "fill": "$--primary",
+                  "cornerRadius": 8,
+                  "gap": 6,
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "mZhPF",
+                      "name": "notePlus",
+                      "fill": "$--primary-foreground",
+                      "content": "+",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "jQpWO",
+                      "name": "noteLabel",
+                      "fill": "$--primary-foreground",
+                      "content": "Add Note",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "Z0V4O",
+          "name": "Main Area",
+          "context": "Responsive: On mobile (<768px), switch to layout:vertical so margin notes stack below editor",
+          "width": "fill_container",
+          "height": "fill_container",
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "1Si4j",
+              "name": "Editor Pane",
+              "width": "fill_container",
+              "height": "fill_container",
+              "fill": "$--background",
+              "layout": "vertical",
+              "padding": [
+                24,
+                16
+              ],
+              "children": [
+                {
+                  "type": "text",
+                  "id": "VcRll",
+                  "name": "editorTitle",
+                  "fill": "$--foreground",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "German Vocabulary — Week 3",
+                  "fontFamily": "Inter",
+                  "fontSize": 24,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "frame",
+                  "id": "QgR3O",
+                  "name": "Editor Body",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 16,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "DhTL3",
+                      "name": "Video Player",
+                      "context": "Implementation: Video player at top. Text below acts as transcript - highlight current sentence as video plays.",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "SXEix",
+                          "name": "videoContainer",
+                          "context": "Implementation: Replace with actual video player (react-native-video or iframe for web)",
+                          "width": "fill_container",
+                          "height": 280,
+                          "fill": "#1A1A1A",
+                          "cornerRadius": 8,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "szoZc",
+                              "name": "playBtn",
+                              "width": 60,
+                              "height": 60,
+                              "fill": "#FFFFFF33",
+                              "cornerRadius": 30,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "sSFy9",
+                                  "name": "playIcon",
+                                  "fill": "#FFFFFF",
+                                  "content": "▶",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 24,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "h57Y1",
+                          "name": "controlsBar",
+                          "width": "fill_container",
+                          "height": 36,
+                          "gap": 12,
+                          "padding": [
+                            0,
+                            8
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "kzTWs",
+                              "name": "currentTime",
+                              "fill": "$--text-secondary",
+                              "content": "0:00",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            },
+                            {
+                              "type": "frame",
+                              "id": "g2Urn",
+                              "name": "progressBar",
+                              "width": "fill_container",
+                              "height": 4,
+                              "fill": "$--border",
+                              "cornerRadius": 2,
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "ZB7Bq",
+                                  "name": "progressFill",
+                                  "width": 80,
+                                  "height": 4,
+                                  "fill": "$--primary",
+                                  "cornerRadius": 2
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "0kwg2",
+                              "name": "duration",
+                              "fill": "$--text-secondary",
+                              "content": "3:24",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "f7CdD",
+                      "name": "para1",
+                      "context": "Implementation: This text is the transcript. Highlight sentences as they are spoken in the video.",
+                      "fill": "$--foreground",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Today I learned several new words related to nature and the outdoors. Die Blume (flower) is feminine, and der Baum (tree) is masculine.",
+                      "lineHeight": 1.7,
+                      "fontFamily": "Inter",
+                      "fontSize": 15,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "DQFVt",
+                      "name": "Para 2",
+                      "context": "Implementation: Use flex-wrap: wrap in CSS to allow inline content to flow to next line on narrow screens",
+                      "width": "fill_container",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "BNXcS",
+                          "name": "text2a",
+                          "fill": "$--foreground",
+                          "content": "The weather vocabulary includes ",
+                          "lineHeight": 1.7,
+                          "fontFamily": "Inter",
+                          "fontSize": 15,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "nHj9b",
+                          "name": "hl1",
+                          "fill": "$--note-highlight",
+                          "cornerRadius": 2,
+                          "padding": [
+                            2,
+                            0
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "lKdyN",
+                              "name": "hl1Text",
+                              "fill": "$--foreground",
+                              "content": "der Regen",
+                              "fontFamily": "Inter",
+                              "fontSize": 15,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "61dNX",
+                          "name": "badge1",
+                          "width": 14,
+                          "height": 14,
+                          "fill": "$--primary",
+                          "cornerRadius": 7,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "jmsOj",
+                              "name": "badge1Num",
+                              "fill": "$--primary-foreground",
+                              "content": "1",
+                              "fontFamily": "Inter",
+                              "fontSize": 8,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "JoEF8",
+                          "name": "text2b",
+                          "fill": "$--foreground",
+                          "content": " (rain) and die Sonne (sun).",
+                          "lineHeight": 1.7,
+                          "fontFamily": "Inter",
+                          "fontSize": 15,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "JyUK9",
+                      "name": "Para 3",
+                      "context": "Implementation: Use flex-wrap: wrap in CSS to allow inline content to flow to next line on narrow screens",
+                      "width": "fill_container",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "9Hu4o",
+                          "name": "text3a",
+                          "fill": "$--foreground",
+                          "content": "I need to practice ",
+                          "lineHeight": 1.7,
+                          "fontFamily": "Inter",
+                          "fontSize": 15,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "frame",
+                          "id": "rei2T",
+                          "name": "hl2",
+                          "fill": "$--note-highlight",
+                          "cornerRadius": 2,
+                          "padding": [
+                            2,
+                            0
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "h4i84",
+                              "name": "hl2Text",
+                              "fill": "$--foreground",
+                              "content": "die Jahreszeiten",
+                              "fontFamily": "Inter",
+                              "fontSize": 15,
+                              "fontWeight": "500"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "RJ36S",
+                          "name": "badge2",
+                          "width": 14,
+                          "height": 14,
+                          "fill": "$--primary",
+                          "cornerRadius": 7,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "Bu8wE",
+                              "name": "badge2Num",
+                              "fill": "$--primary-foreground",
+                              "content": "2",
+                              "fontFamily": "Inter",
+                              "fontSize": 8,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "yCaXa",
+                          "name": "text3b",
+                          "fill": "$--foreground",
+                          "content": " (the seasons) vocabulary more.",
+                          "lineHeight": 1.7,
+                          "fontFamily": "Inter",
+                          "fontSize": 15,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Xbobe",
+              "name": "Margin Notes Panel",
+              "context": "Mobile: width becomes fill_container, stacks below editor",
+              "width": "fill_container",
+              "height": 200,
+              "fill": "$--margin-panel",
+              "layout": "vertical",
+              "gap": 12,
+              "padding": 16,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "9pG2j",
+                  "name": "marginHeader",
+                  "fill": "$--muted-foreground",
+                  "content": "NOTES",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "600",
+                  "letterSpacing": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "POUkr",
+                  "name": "Note Card 1",
+                  "width": "fill_container",
+                  "fill": "$--card",
+                  "cornerRadius": 8,
+                  "layout": "vertical",
+                  "gap": 4,
+                  "padding": 10,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Qwgnz",
+                      "name": "note1Header",
+                      "width": "fill_container",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "dz5kC",
+                          "name": "note1Badge",
+                          "width": 20,
+                          "height": 20,
+                          "fill": "$--primary",
+                          "cornerRadius": 10,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "bmFq0",
+                              "name": "note1BadgeNum",
+                              "fill": "$--primary-foreground",
+                              "content": "1",
+                              "fontFamily": "Inter",
+                              "fontSize": 10,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "ci8iV",
+                          "name": "note1Title",
+                          "fill": "$--foreground",
+                          "content": "der Regen",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "ttAZM",
+                      "name": "note1Content",
+                      "fill": "$--text-secondary",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Masculine noun. Remember: weather phenomena are often masculine in German.",
+                      "lineHeight": 1.4,
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "xiaBO",
+                  "name": "Note Card 2",
+                  "width": "fill_container",
+                  "fill": "$--card",
+                  "cornerRadius": 8,
+                  "layout": "vertical",
+                  "gap": 4,
+                  "padding": 10,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "cE5G5",
+                      "name": "note2Header",
+                      "width": "fill_container",
+                      "gap": 8,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "tOgAH",
+                          "name": "note2Badge",
+                          "width": 20,
+                          "height": 20,
+                          "fill": "$--primary",
+                          "cornerRadius": 10,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "ejU58",
+                              "name": "note2BadgeNum",
+                              "fill": "$--primary-foreground",
+                              "content": "2",
+                              "fontFamily": "Inter",
+                              "fontSize": 10,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "text",
+                          "id": "zBUYT",
+                          "name": "note2Title",
+                          "fill": "$--foreground",
+                          "content": "die Jahreszeiten",
+                          "fontFamily": "Inter",
+                          "fontSize": 12,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "PY6xA",
+                      "name": "note2Content",
+                      "fill": "$--text-secondary",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "Feminine plural. Spring=Frühling, Summer=Sommer, Fall=Herbst, Winter=Winter",
+                      "lineHeight": 1.4,
+                      "fontFamily": "Inter",
+                      "fontSize": 11,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "zBkIX",
+      "x": 1351,
+      "y": 2143,
+      "name": "Word Net (Mobile 360×800)",
+      "context": "DERIVATIVE: Regenerate from Desktop source of truth after changes.",
+      "theme": {
+        "Style": "Minimal Light"
+      },
+      "clip": true,
+      "width": 360,
+      "height": 800,
+      "fill": "$--background",
+      "layout": "vertical",
+      "children": [
+        {
+          "type": "frame",
+          "id": "nb8X7",
+          "name": "Word Info Pane",
+          "width": "fill_container",
+          "height": 400,
+          "fill": "$--background",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": 20,
+          "children": [
+            {
+              "type": "text",
+              "id": "VYtiX",
+              "name": "Lemma Title",
+              "fill": "$--foreground",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "vorbereiten",
+              "fontFamily": "Inter",
+              "fontSize": 32,
+              "fontWeight": "600"
+            },
+            {
+              "type": "frame",
+              "id": "ImymW",
+              "name": "Form Section",
+              "width": "fill_container",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "ewVdj",
+                  "name": "Speaker Button",
+                  "context": "Implementation: Play audio pronunciation of the word when clicked.",
+                  "fill": "$--primary",
+                  "content": "🔊",
+                  "fontFamily": "Inter",
+                  "fontSize": 24,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "frame",
+                  "id": "iOWLn",
+                  "name": "Form with Stress",
+                  "context": "The stressed syllable 'vor' has an underline decoration.",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "fTIFh",
+                      "name": "Stressed Syllable",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "NU1hM",
+                          "name": "stressedText",
+                          "fill": "$--foreground",
+                          "content": "vor",
+                          "fontFamily": "Inter",
+                          "fontSize": 28,
+                          "fontWeight": "medium"
+                        },
+                        {
+                          "type": "rectangle",
+                          "id": "Fi0k8",
+                          "name": "Stress Underline",
+                          "fill": "$--foreground",
+                          "width": 40,
+                          "height": 2
+                        }
+                      ]
+                    },
+                    {
+                      "type": "text",
+                      "id": "E66Gp",
+                      "name": "midDot",
+                      "fill": "$--foreground",
+                      "content": "・",
+                      "fontFamily": "Inter",
+                      "fontSize": 28,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Dodur",
+                      "name": "restText",
+                      "fill": "$--foreground",
+                      "content": "bereiten",
+                      "fontFamily": "Inter",
+                      "fontSize": 28,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "bS9M1",
+              "name": "Grammar Section",
+              "width": "fill_container",
+              "gap": 12,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "2bJHE",
+                  "name": "Grammar Tag",
+                  "fill": "$--primary",
+                  "content": "G",
+                  "fontFamily": "Inter",
+                  "fontSize": 24,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "uHqaR",
+                  "name": "Grammar Forms",
+                  "fill": "$--foreground",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "bereitete vor, hat vorbereitet",
+                  "fontFamily": "Inter",
+                  "fontSize": 20,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "FDmJ7",
+              "name": "Divider",
+              "width": "fill_container",
+              "height": 1,
+              "fill": "$--border"
+            },
+            {
+              "type": "frame",
+              "id": "worjT",
+              "name": "Senses Section",
+              "context": "Implementation: Paginated list of senses. Show one sense at a time with prev/next navigation or swipe gesture.",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "WIgdH",
+                  "name": "Senses Header Row",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Mq9nb",
+                      "name": "Senses Tag",
+                      "fill": "$--primary",
+                      "content": "S",
+                      "fontFamily": "Inter",
+                      "fontSize": 24,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "4V80F",
+                      "name": "Pagination Dots",
+                      "width": "fill_container",
+                      "gap": 8,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "ellipse",
+                          "id": "AmRot",
+                          "name": "Dot Active",
+                          "fill": "$--primary",
+                          "width": 10,
+                          "height": 10
+                        },
+                        {
+                          "type": "ellipse",
+                          "id": "kdw4m",
+                          "name": "Dot",
+                          "width": 10,
+                          "height": 10,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "$--primary"
+                          }
+                        },
+                        {
+                          "type": "ellipse",
+                          "id": "wB2ki",
+                          "name": "Dot",
+                          "width": 10,
+                          "height": 10,
+                          "stroke": {
+                            "thickness": 1,
+                            "fill": "$--primary"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "b0BYg",
+                  "name": "Sense Header",
+                  "width": "fill_container",
+                  "gap": 12,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "lJjzv",
+                      "name": "Sense Number",
+                      "fill": "$--foreground",
+                      "content": "(1)",
+                      "fontFamily": "Inter",
+                      "fontSize": 24,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "oJtfh",
+                      "name": "Sense Definition",
+                      "fill": "$--text-secondary",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "etwas, jemanden oder sich selbst einer Voraussicht oder Zukunftserwartung anpassen; so ändern ...",
+                      "fontFamily": "Inter",
+                      "fontSize": 16,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "3DdOO",
+                  "name": "Examples Container",
+                  "context": "Implementation: List of example sentences. Each has a favorite button and can be removed. User can add custom examples.",
+                  "width": "fill_container",
+                  "height": "fill_container",
+                  "layout": "vertical",
+                  "gap": 12,
+                  "padding": [
+                    0,
+                    0,
+                    0,
+                    36
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "RDtQC",
+                      "name": "Example Row",
+                      "width": "fill_container",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "PPOe3",
+                          "name": "Favorite Button",
+                          "context": "Implementation: Toggle to remove/unfavorite this example",
+                          "fill": "$--muted-foreground",
+                          "content": "−",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "5ykGx",
+                          "name": "Example Text",
+                          "fill": "$--foreground",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Das Team bereitet derzeit eine Veröffentlichung in einem Fachmagazin vor.",
+                          "fontFamily": "Inter",
+                          "fontSize": 16,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "0oSxV",
+                          "name": "Add to Favorites",
+                          "context": "Implementation: Add this example to favorites/saved examples",
+                          "fill": "$--primary",
+                          "content": "+",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ulCN8",
+                      "name": "Example Row 2",
+                      "width": "fill_container",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "OK5wS",
+                          "name": "ex2Fav",
+                          "fill": "$--muted-foreground",
+                          "content": "−",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "ZmYi2",
+                          "name": "ex2Text",
+                          "fill": "$--foreground",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Ich muss mich noch auf die morgige Prüfung vorbereiten.",
+                          "fontFamily": "Inter",
+                          "fontSize": 16,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "yaLc0",
+                          "name": "ex2Add",
+                          "fill": "$--primary",
+                          "content": "+",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "aP7aa",
+                      "name": "Example Row 3",
+                      "width": "fill_container",
+                      "gap": 8,
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "ztTkL",
+                          "name": "ex3Fav",
+                          "fill": "$--muted-foreground",
+                          "content": "−",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "myw8d",
+                          "name": "ex3Text",
+                          "fill": "$--foreground",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Wir haben das Haus auf den kommenden Sturm bereits vorbereitet.",
+                          "fontFamily": "Inter",
+                          "fontSize": 16,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "7Srxt",
+                          "name": "ex3Add",
+                          "fill": "$--primary",
+                          "content": "+",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "vFigf",
+                      "name": "Add Example Button",
+                      "context": "Implementation: Opens input to add a custom example sentence",
+                      "cornerRadius": 8,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "$--primary"
+                      },
+                      "gap": 8,
+                      "padding": [
+                        8,
+                        16
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "t0sF4",
+                          "name": "addExIcon",
+                          "fill": "$--primary",
+                          "content": "+",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "text",
+                          "id": "1CHIB",
+                          "name": "addExLabel",
+                          "fill": "$--primary",
+                          "content": "Add custom example",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "TXPQD",
+          "name": "Word Net Graph Pane",
+          "clip": true,
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": "$--muted",
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "B86Je",
+              "name": "Graph Toolbar",
+              "context": "Implementation: Toolbar for Word Net graph controls - zoom, fit, and node manipulation",
+              "width": "fill_container",
+              "height": 40,
+              "fill": "$--border",
+              "gap": 8,
+              "padding": [
+                6,
+                12
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "RYxS1",
+                  "name": "Left Controls",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "xMeap",
+                      "name": "Zoom In",
+                      "width": 32,
+                      "height": 32,
+                      "fill": "$--background",
+                      "cornerRadius": 4,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "EciO0",
+                          "name": "zoomInIcon",
+                          "fill": "$--foreground",
+                          "content": "+",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "CIvYs",
+                      "name": "Zoom Slider",
+                      "context": "Implementation: Horizontal slider for zoom level. Thumb position indicates current zoom.",
+                      "width": 80,
+                      "height": 4,
+                      "fill": "$--border",
+                      "cornerRadius": 2,
+                      "layout": "none",
+                      "children": [
+                        {
+                          "type": "ellipse",
+                          "id": "OULk7",
+                          "x": 34,
+                          "y": -4,
+                          "name": "Slider Thumb",
+                          "fill": "$--primary",
+                          "width": 12,
+                          "height": 12
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "GLwQW",
+                      "name": "Zoom Out",
+                      "width": 32,
+                      "height": 32,
+                      "fill": "$--background",
+                      "cornerRadius": 4,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "X3yV9",
+                          "name": "zoomOutIcon",
+                          "fill": "$--foreground",
+                          "content": "−",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "FnB90",
+                      "name": "Fit to View",
+                      "context": "Implementation: Fit entire graph into visible viewport",
+                      "width": 32,
+                      "height": 32,
+                      "fill": "$--background",
+                      "cornerRadius": 4,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Zi9YL",
+                          "name": "fitIcon",
+                          "fill": "$--foreground",
+                          "content": "⛶",
+                          "fontFamily": "Inter",
+                          "fontSize": 20,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "SDDBp",
+                  "name": "Right Controls",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "Kuvhg",
+                      "name": "Delete Node",
+                      "context": "Implementation: Delete the currently selected node from the graph",
+                      "width": 32,
+                      "height": 32,
+                      "fill": "$--background",
+                      "cornerRadius": 4,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Zumnc",
+                          "name": "deleteIcon",
+                          "fill": "$--foreground",
+                          "content": "🗑",
+                          "fontFamily": "Inter",
+                          "fontSize": 16,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "YcsDL",
+                      "name": "Expand Node",
+                      "context": "Implementation: Expand the selected node to show more connections",
+                      "width": 32,
+                      "height": 32,
+                      "fill": "$--background",
+                      "cornerRadius": 4,
+                      "justifyContent": "center",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "0bwzA",
+                          "name": "expandIcon",
+                          "fill": "$--foreground",
+                          "content": "⊕",
+                          "fontFamily": "Inter",
+                          "fontSize": 18,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "L67Wm",
+              "name": "Graph Canvas",
+              "context": "Implementation: Force-directed graph layout using d3-force or react-force-graph. Nodes are draggable. SHAPES: Circles = verbs (gray for related, green for center), Squares = nouns (yellow fill). CONNECTIONS: Render programmatically as SVG lines or bezier curves between node centers. Line style indicates relationship type (solid=synonym, dashed=related). Pan/zoom gestures supported.",
+              "clip": true,
+              "width": "fill_container",
+              "height": "fill_container",
+              "fill": "$--muted",
+              "layout": "none",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "Y9Fp6",
+                  "x": 250,
+                  "y": 250,
+                  "name": "Center Node Group",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "75wjL",
+                      "name": "Center Circle",
+                      "context": "Implementation: Main word node. Green filled circle indicates the focused/current word.",
+                      "fill": "$--primary",
+                      "width": 50,
+                      "height": 50
+                    },
+                    {
+                      "type": "text",
+                      "id": "U6JMU",
+                      "name": "centerLabel",
+                      "fill": "$--foreground",
+                      "content": "vorbereiten",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "jGeFn",
+                  "x": 120,
+                  "y": 140,
+                  "name": "Related Node Group",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "d2tsk",
+                      "name": "circle1",
+                      "context": "Implementation: Related word nodes. Gray circles. On click, navigate to that word.",
+                      "fill": "$--muted-foreground",
+                      "width": 40,
+                      "height": 40
+                    },
+                    {
+                      "type": "text",
+                      "id": "XXD1e",
+                      "name": "label1",
+                      "fill": "$--foreground",
+                      "content": "bereiten",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "jyaFJ",
+                  "x": 380,
+                  "y": 160,
+                  "name": "Related Node Group",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 4,
+                      "id": "X6Bu9",
+                      "name": "nounSquare",
+                      "context": "Yellow square = noun. Vorbereitung is a feminine noun (die Vorbereitung).",
+                      "fill": "#FFFDE7",
+                      "width": 40,
+                      "height": 40,
+                      "stroke": {
+                        "thickness": 2,
+                        "fill": "$--foreground"
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "id": "TdgLr",
+                      "name": "label2",
+                      "fill": "$--foreground",
+                      "content": "Vorbereitung",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "m1vwh",
+                  "x": 140,
+                  "y": 360,
+                  "name": "Related Node Group",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "XGpN7",
+                      "name": "circle3",
+                      "fill": "$--muted-foreground",
+                      "width": 40,
+                      "height": 40
+                    },
+                    {
+                      "type": "text",
+                      "id": "0xM98",
+                      "name": "label3",
+                      "fill": "$--foreground",
+                      "content": "fertig",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "si7jK",
+                  "x": 360,
+                  "y": 340,
+                  "name": "Related Node Group",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "S0hBz",
+                      "name": "circle4",
+                      "fill": "$--muted-foreground",
+                      "width": 40,
+                      "height": 40
+                    },
+                    {
+                      "type": "text",
+                      "id": "2cN4h",
+                      "name": "label4",
+                      "fill": "$--foreground",
+                      "content": "planen",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "UKhZ3",
+                  "x": 10,
+                  "y": 10,
+                  "name": "Connection Lines Note",
+                  "width": 180,
+                  "height": 50,
+                  "fill": "$--accent",
+                  "cornerRadius": 4,
+                  "padding": 8,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "J1fV0",
+                      "name": "connNoteText",
+                      "fill": "$--text-secondary",
+                      "textGrowth": "fixed-width",
+                      "width": "fill_container",
+                      "content": "⚠️ Connection lines rendered programmatically. Circles=verbs, Squares=nouns",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "FRaVK",
+                  "x": 400,
+                  "y": 90,
+                  "name": "Related Node Group",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "ellipse",
+                      "id": "qFiUE",
+                      "name": "rustenCircle",
+                      "context": "Gray circle = verb. rüsten (to arm, to prepare).",
+                      "fill": "$--muted-foreground",
+                      "width": 40,
+                      "height": 40
+                    },
+                    {
+                      "type": "text",
+                      "id": "U5433",
+                      "name": "rustenLabel",
+                      "fill": "$--foreground",
+                      "content": "rüsten",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "themes": {
+    "Style": [
+      "Minimal Light",
+      "Minimal Dark"
+    ]
+  },
+  "variables": {
+    "--accent": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#1E3A5F15",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "#D4A57420",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--background": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#FAF8F5",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "#151517",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--border": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#E8E5E0",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "#2E2E32",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--card": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#FFFFFF",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "#1E1E21",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--card-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#1C1C1C",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "#EDEAE5",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--font-display": {
+      "type": "string",
+      "value": [
+        {
+          "value": "Inter",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "Inter",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--font-primary": {
+      "type": "string",
+      "value": [
+        {
+          "value": "Inter",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "Inter",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--font-secondary": {
+      "type": "string",
+      "value": [
+        {
+          "value": "Inter",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "Inter",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#1C1C1C",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "#EDEAE5",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--margin-panel": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#F5F3F0",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "#1A1A1D",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--muted": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#F5F3F0",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "#232326",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--muted-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#9A9A9A",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "#9B9B9F",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--note-badge": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#1E3A5F",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "#D4A574",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--note-highlight": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#1E3A5F20",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "#D4A57425",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--primary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#1E3A5F",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "#D4A574",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--primary-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#FFFFFF",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "#151517",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--radius-lg": {
+      "type": "number",
+      "value": [
+        {
+          "value": 16,
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": 16,
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--radius-md": {
+      "type": "number",
+      "value": [
+        {
+          "value": 12,
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": 12,
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--radius-none": {
+      "type": "number",
+      "value": [
+        {
+          "value": 0,
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": 0,
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--radius-sm": {
+      "type": "number",
+      "value": [
+        {
+          "value": 8,
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": 8,
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--secondary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#F5F3F0",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "#2A2A2E",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--secondary-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#1C1C1C",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "#EDEAE5",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    },
+    "--text-secondary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#6B6B6B",
+          "theme": {
+            "Style": "Minimal Light"
+          }
+        },
+        {
+          "value": "#B0B0B5",
+          "theme": {
+            "Style": "Minimal Dark"
+          }
+        }
+      ]
+    }
+  }
+}
